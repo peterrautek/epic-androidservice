@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
+
+<LinearLayout android:id="@+id/LinearLayout01" android:layout_height="wrap_content" android:layout_width="fill_parent"><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Status: "></TextView><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/menu_text_registrationstatus" android:text="not registered"></TextView>
+
+</LinearLayout>
+
+<Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:layout_margin="20dip" android:text="Register User" android:id="@+id/menu_button_register" android:enabled="false"></Button>
+<Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:layout_margin="20dip" android:text="Delete Account" android:id="@+id/menu_button_delete" android:enabled="false"></Button>
+<Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:layout_margin="20dip" android:text="Send Link" android:id="@+id/menu_button_sendlink" android:enabled="false"></Button>
+<!-- Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:layout_margin="20dip" android:text="Start Service" android:id="@+id/menu_button_services" android:enabled="false"></Button-->
+
+</LinearLayout>

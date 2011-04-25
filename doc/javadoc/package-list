@@ -1,0 +1,5 @@
+org.mobilesynergies.android.epic.service
+org.mobilesynergies.android.epic.service.activities
+org.mobilesynergies.android.epic.service.client
+org.mobilesynergies.android.epic.service.core
+org.mobilesynergies.android.epic.service.core.states

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="javadoc">
+    <target name="javadoc">
+        <javadoc access="public" author="false" classpath="C:\libraries\asmack-android-1.1-2010.01.06-source\asmack-android-1.1-2010.01.06.jar" destdir="javadoc" doctitle="EPIC Service" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" packagenames="org.mobilesynergies.android.epic.service.core.states,org.mobilesynergies.android.epic.service.client,org.mobilesynergies.android.epic.service.activities" source="1.5" sourcefiles="../src/org/mobilesynergies/android/epic/service/core/EpicServiceAdministrationInterfaceImplementation.java,../src/org/mobilesynergies/android/epic/service/core/PresenceTypeAdapter.java,../src/org/mobilesynergies/android/epic/service/core/EpicServiceApplicationInterfaceImplementation.java,../src/org/mobilesynergies/android/epic/service/ServiceAdministrationActivity.java,../src/org/mobilesynergies/android/epic/service/EpicServiceState.java,../src/org/mobilesynergies/android/epic/service/EpicService.java,../src/org/mobilesynergies/android/epic/service/core/ApplicationSession.java,../src/org/mobilesynergies/android/epic/service/core/PromptUserLogin.java,../src/org/mobilesynergies/android/epic/service/core/NetworkNode.java,../src/org/mobilesynergies/android/epic/service/core/EpicServiceAdministrationInterface.java,../src/org/mobilesynergies/android/epic/service/core/ApplicationNode.java,../src/org/mobilesynergies/android/epic/service/core/IncomingMessageCallback.java" sourcepath="../gen;../src" splitindex="true" stylesheetfile="C:\Users\Peter\Projects\eclipse\workspace\EPIC Service\doc\templates\stylesheet.css" use="true" version="false">
+            <link href="file:/C:/SDKs/google/android/android-sdk-windows/docs/reference"/>
+            <link href="file:/C:/Users/Peter/Projects/eclipse/workspace/EPIC%20Service/doc/javadoc/"/>
+        </javadoc>
+    </target>
+</project>

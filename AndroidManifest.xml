@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+	package="org.mobilesynergies.android.epic.service" android:versionCode="1"
+	android:versionName="1.0">
+
+
+
+	<permission android:label="@string/permission_label_receiveMessages"
+		android:description="@string/permission_description_receiveMessages"
+		android:permissionGroup="android.permission-group.MESSAGES"
+		android:protectionLevel="normal"
+		android:name="org.mobilesynergies.android.epic.permission.receivemessages" />
+
+	<permission android:label="@string/permission_label_sendMessages"
+		android:description="@string/permission_description_sendMessages"
+		android:permissionGroup="android.permission-group.MESSAGES"
+		android:protectionLevel="normal"
+		android:name="org.mobilesynergies.android.epic.permission.sendmessages" />
+
+	<application android:icon="@drawable/icon" android:label="@string/app_name" android:debuggable="true">
+	
+				
+		<activity android:name=".remoteui.RemoteUserInterfaceActivity"
+			android:label="@string/app_name">
+		</activity>
+		
+		<activity android:name=".administration.LogActivity"
+			android:label="@string/app_name" android:launchMode="singleTop">
+		</activity>
+		
+		<activity android:name=".application.BrowserHistoryProviderActivity"
+			android:label="@string/app_name" android:launchMode="singleTop">
+			<!--  intent-filter>
+				<action android:name="android.intent.action.MAIN" />
+				<category android:name="android.intent.category.LAUNCHER" />
+			</intent-filter-->
+			<intent-filter>
+				<action android:name="org.epic.action.ListBrowserHistory"/>
+				<category android:name="android.intent.category.DEFAULT" />
+				
+			</intent-filter>
+			
+		</activity>
+		
+		
+		<activity android:name=".application.SnippetsActivity"
+			android:label="@string/app_name" android:launchMode="singleTop">
+		</activity>
+
+		<activity android:name=".application.RingMyPhoneActivity"
+			android:label="@string/app_name" android:launchMode="singleTop">
+			<intent-filter>
+				<action android:name="org.epic.action.RingPhone"/>
+				<category android:name="android.intent.category.DEFAULT" />
+			</intent-filter>
+		</activity>
+
+		<activity android:name=".administration.ExploreEpicNetwork"
+			android:label="@string/app_name" android:launchMode="singleInstance" android:screenOrientation="portrait">
+			<intent-filter>
+				<action android:name="org.mobilesynergies.android.epic.service.explore"/>
+				<category android:name="android.intent.category.DEFAULT" />
+			</intent-filter>
+			
+			
+		</activity>
+		
+		<activity android:name=".core.LoginActivity"
+			android:label="@string/app_name">
+			<intent-filter>
+				<action android:name="org.mobilesynergies.android.epic.service.login"/>
+				<category android:name="android.intent.category.DEFAULT" />
+			</intent-filter>
+		</activity>
+	
+		<activity android:name=".core.MainActivity"
+			android:label="@string/app_name">
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN" />
+				<category android:name="android.intent.category.LAUNCHER" />
+			</intent-filter>
+			
+		</activity>
+		
+		<service android:name=".EpicService" android:exported="true"> <!--android:process=":RemoteIntentServiceProcess"-->
+			<intent-filter>
+				<action android:name="org.mobilesynergies.android.epic.service.interfaces.IEpicServiceAdministrationInterface" />
+				<action android:name="org.mobilesynergies.EPIC_SERVICE" />
+			</intent-filter>
+		</service>
+		
+		<receiver android:name=".core.NetworkConnectivityStatusReceiver"
+			android:enabled="true">
+			<intent-filter>
+				<action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+			</intent-filter>
+		</receiver>
+
+		<receiver android:name=".core.ServiceStatusWidget" android:label="@string/widget_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget" />
+        </receiver>
+        
+	</application>
+	<uses-sdk android:minSdkVersion="4" />
+
+	<uses-permission android:name="android.permission.INTERNET"></uses-permission>
+	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"></uses-permission>
+	<uses-permission android:name="com.android.browser.permission.READ_HISTORY_BOOKMARKS"></uses-permission>
+	<uses-permission android:name="org.mobilesynergies.android.epic.permission.sendmessages"></uses-permission>
+	
+	
+</manifest> 

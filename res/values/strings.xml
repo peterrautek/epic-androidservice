@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <string name="app_name">EPIC Service</string>
+<string name="permission_label_receiveMessages">Receive messages of other devices</string>
+<string name="permission_label_sendMessages">Send messages to other devices</string>
+<string name="permission_description_receiveMessages">Allows the application to federate with other EPIC devices. The application can receive requests, commands, or data from other devices.</string>
+<string name="permission_description_sendMessages">Allows the application to federate with other EPIC devices. The application can send requests, commands, or data to other devices.</string>
+<string name="widget_name">Epic service state</string>
+<string name="widget_loading">"Loading... "</string>
+<string name="widget_error">Error</string>
+    
+
+</resources>
