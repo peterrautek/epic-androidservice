@@ -3,9 +3,11 @@ package org.mobilesynergies.android.epic.service.core;
 import org.mobilesynergies.android.epic.service.EpicService;
 import org.mobilesynergies.android.epic.service.R;
 import org.mobilesynergies.android.epic.service.administration.ExploreEpicNetwork;
+import org.mobilesynergies.android.epic.service.administration.LogActivity;
 import org.mobilesynergies.android.epic.service.administration.ServiceAdministrationActivity;
 import org.mobilesynergies.android.epic.service.core.IntentIntegrator;
 import org.mobilesynergies.android.epic.service.core.states.EpicServiceState;
+import org.mobilesynergies.android.epic.service.core.states.EpicServiceStateChangeManager;
 import org.mobilesynergies.android.epic.service.interfaces.IEpicServiceAdministrationInterface;
 import org.mobilesynergies.android.epic.service.interfaces.IEpicServiceApplicationInterface;
 import org.mobilesynergies.android.epic.service.interfaces.IServiceStatusChangeCallback;
@@ -70,12 +72,24 @@ public class MainActivity extends Activity{
 		updateUI();
 		testLogin();
 	}
+	
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		if(mIsBound){
+	        // Detach our existing connection.
+	        unbindService(mServiceConnection);
+	        mIsBound = false;
+		}
+	}
 
 	private final static int MENUID_EXPLORENETWORK = 1;
+	private static final int MENUID_LOG = 2;
 
 	public boolean onCreateOptionsMenu(Menu menu){
 
 		menu.add(0,MENUID_EXPLORENETWORK,0,"Explore Network");
+		menu.add(0,MENUID_LOG,0,"Log messages");
 
 		return true;
 
@@ -86,8 +100,13 @@ public class MainActivity extends Activity{
 		int id = item.getItemId();
 		switch(id){
 		case MENUID_EXPLORENETWORK:
-			Intent intent = new Intent(ExploreEpicNetwork.INTENTACTION);
-			startActivity(intent);
+			Intent exploreintent = new Intent(ExploreEpicNetwork.INTENTACTION);
+			startActivity(exploreintent);
+			break;
+		
+		case MENUID_LOG:
+			Intent logintent = new Intent(LogActivity.INTENTACTION);
+			startActivity(logintent);
 			break;
 		}
 		return true;
@@ -163,7 +182,7 @@ public class MainActivity extends Activity{
 					
 					try {
 						isAuth = client.authenticateUser(username, password, device);
-						//client.sendMessage("asdf@ubuntu/test2", "lala", null);
+						
 					} catch (EpicClientException e) {
 						e.printStackTrace();
 					}
@@ -172,11 +191,11 @@ public class MainActivity extends Activity{
 						
 					}	else {
 						mToastHandler.sendEmptyMessage(MESSAGEID_SUCCESS);
-						client.disconnect(); 
 						mServiceStartHandler.sendEmptyMessage(0);
 					}
 
 				}
+				client.disconnect();
 				
 				
 			}
@@ -261,7 +280,7 @@ public class MainActivity extends Activity{
 			// service through an IDL interface, so get a client-side
 			// representation of that from the raw service object.
 			Toast.makeText(MainActivity.this, "The epic service process was started sucessfully!", Toast.LENGTH_LONG).show();
-			mEpicService = (ApplicationInterface) IEpicServiceApplicationInterface.Stub.asInterface(service);
+			mEpicService = (IEpicServiceApplicationInterface) IEpicServiceApplicationInterface.Stub.asInterface(service);
 			mIsBound = true;
 			try {
 				mEpicService.registerServiceStatusChangeCallback(mServiceStatusChangeCallback);
@@ -289,19 +308,19 @@ public class MainActivity extends Activity{
 		@Override
 		public void onServiceStatusChanged(int status)
 				throws RemoteException {
-			if(status==EpicServiceState.STATE_AUTHENTICATED) {
+			if(status==EpicServiceState.EPICNETWORKCONNECTION) {
 				//onConnectedToEpicNetwork();
 				MainActivity.this.mToastHandler.sendEmptyMessage(MESSAGEID_AUTHENTICATED);
 			}
-			else if(status==EpicServiceState.STATE_INTERNETCONNECTED) {
+			else if(status==EpicServiceState.NETWORKCONNECTION) {
 				//onConnectedToEpicNetwork();
 				MainActivity.this.mToastHandler.sendEmptyMessage(MESSAGEID_INTERNETCONNECTED);
 			}
-			else if(status==EpicServiceState.STATE_SERVERCONNECTED) {
+			else if(status==EpicServiceState.SERVERCONNECTION) {
 				//onConnectedToEpicNetwork();
 				MainActivity.this.mToastHandler.sendEmptyMessage(MESSAGEID_SERVERCONNECTED);
 			} 
-			else if(status==EpicServiceState.STATE_UNCONNECTED) {
+			else if(status==EpicServiceState.NONETWORKCONNECTION) {
 				//onConnectedToEpicNetwork();
 				MainActivity.this.mToastHandler.sendEmptyMessage(MESSAGEID_UNCONNECTED);
 			} 
@@ -322,7 +341,7 @@ public class MainActivity extends Activity{
 
 	
 	
-	protected ApplicationInterface mEpicService = null;
+	protected IEpicServiceApplicationInterface mEpicService = null;
 	boolean mIsBound = false;
 
 

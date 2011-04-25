@@ -56,7 +56,7 @@ public class NetworkConnectivityStatusReceiver extends BroadcastReceiver {
 		data.putBoolean(BOOLEAN_IS_CONNECTED, isconnected);
 		serviceIntent.putExtras(data);
 		context.startService(serviceIntent);
-		//Log.d(CLASS_TAG, "compoent name: "+cn.flattenToString());
+		//Log.d(CLASS_TAG, "component name: "+cn.flattenToString());
 		
 	}
 }

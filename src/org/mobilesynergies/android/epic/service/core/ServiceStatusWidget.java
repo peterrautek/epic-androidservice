@@ -17,7 +17,7 @@ public class ServiceStatusWidget extends AppWidgetProvider{
 
 	@Override
 	public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-		Log.d("WordWidget.UpdateService", "onUpdate()");
+		Log.d("ServiceStatusWidget", "onUpdate()");
 		// To prevent any ANR timeouts, we perform the update in a service
 		context.startService(new Intent(context, EpicService.class));
 	}
@@ -42,7 +42,7 @@ public class ServiceStatusWidget extends AppWidgetProvider{
 
 		// When user clicks on widget, launch log activity
 		Intent intent = new Intent();
-		intent.setClassName("org.mobilesynergies.android.epic.service", LogActivity.class.getCanonicalName());
+		intent.setClassName("org.mobilesynergies.android.epic.service.administration", LogActivity.class.getCanonicalName());
 		PendingIntent pendingIntent = PendingIntent.getActivity(context,
 				0 /* no requestCode */, intent, 0 /* no flags */);
 		views.setOnClickPendingIntent(R.id.widget, pendingIntent);

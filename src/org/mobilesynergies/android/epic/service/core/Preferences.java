@@ -21,7 +21,7 @@ public final class Preferences {
 	
 	public static String getConfiguredServerName(Context context) {
 		SharedPreferences settings = getUserSettings(context);
-		String servername = settings.getString("server", "mobilesynergies.org");
+		String servername = settings.getString("server", "www.mobilesynergies.org");
 		return servername;
 	}
 	
@@ -34,7 +34,7 @@ public final class Preferences {
 	
 	public static String getConfiguredServiceName(Context context) {
 		SharedPreferences settings = getUserSettings(context);
-		String service = settings.getString("service", "ubuntu");
+		String service = settings.getString("service", "box");
 		return service;
 	}
 	

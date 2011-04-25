@@ -250,13 +250,13 @@ public class LoginActivity extends Activity{
 			}else {
 				Toast.makeText(this, result, Toast.LENGTH_LONG).show();
 
-				String[] userpasswordserver = result.split("@");
-				if((userpasswordserver!=null)&&(userpasswordserver.length!=2)){
-
+				String[] userandpasswordandservice = result.split("@");
+				if((userandpasswordandservice!=null)&&(userandpasswordandservice.length!=2)){
+					
 					Toast.makeText(this, "Scanning the QrCode didn't work. Please try entering the username and password manually. Cause: Invalid id (no @ symbol found)", Toast.LENGTH_LONG).show();
 				} else {
-
-					String[] userandpassword = userpasswordserver[0].split(":");
+					Preferences.setConfiguredServiceName(this, userandpasswordandservice[1]);
+					String[] userandpassword = userandpasswordandservice[0].split(":");
 					if((userandpassword!=null)&&(userandpassword.length!=2)){
 						Toast.makeText(this, "Scanning the QrCode didn't work. Please try entering the username and password manually. Cause: invalid id (no : symbol found)", Toast.LENGTH_LONG).show();
 					} else {
@@ -264,6 +264,8 @@ public class LoginActivity extends Activity{
 						EditText etpassword = (EditText) findViewById(R.id.edittextpassword);
 						etusername.setText(userandpassword[0]);
 						etpassword.setText(userandpassword[1]);
+						Preferences.setUserName(this, userandpassword[0]);
+						Preferences.setUserPassword(this, userandpassword[1]);
 					}
 				}
 			}

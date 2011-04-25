@@ -3,6 +3,7 @@ package org.mobilesynergies.android.epic.service.administration;
 import org.mobilesynergies.android.epic.service.EpicService;
 import org.mobilesynergies.android.epic.service.core.AdministrationInterface;
 import org.mobilesynergies.android.epic.service.core.states.EpicServiceState;
+import org.mobilesynergies.android.epic.service.core.states.EpicServiceStateChangeManager;
 
 import org.mobilesynergies.android.epic.service.interfaces.IEpicServiceAdministrationInterface;
 import org.mobilesynergies.android.epic.service.interfaces.IServiceStatusChangeCallback;
@@ -132,7 +133,7 @@ public abstract class ServiceAdministrationActivity extends Activity {
 		@Override
 		public void onServiceStatusChanged(int status)
 				throws RemoteException {
-			if(status==EpicServiceState.STATE_AUTHENTICATED) {
+			if(status==EpicServiceState.EPICNETWORKCONNECTION) {
 				onConnectedToEpicNetwork();
 			} 
 		}

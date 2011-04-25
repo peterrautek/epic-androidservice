@@ -5,6 +5,7 @@ import org.mobilesynergies.android.epic.service.core.Preferences;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
@@ -18,6 +19,8 @@ import android.widget.ArrayAdapter;
  */
 
 public class LogActivity extends ListActivity {
+
+	public static final String INTENTACTION = "org.mobilesynergies.android.epic.service.log";
 
 	/** 
 	 * Called when the activity is first created. 

@@ -84,9 +84,9 @@ ExpandableListView.OnGroupExpandListener {
 			if(mMapNetworkNodes==null){
 				return;
 			}
-			
+
 			((BaseExpandableListAdapter) mAdapter).notifyDataSetChanged();
-			
+
 		}
 	};
 
@@ -104,9 +104,9 @@ ExpandableListView.OnGroupExpandListener {
 			}
 
 			mMapNetworkNodes.put(node.mAddress.getFullAddressString(), node);
-			
+
 			MyExpandableListAdapter adapter = (MyExpandableListAdapter)mAdapter;
-			
+
 			Collection<NetworkNode> nodes = mMapNetworkNodes.values();
 			Iterator<NetworkNode> nodesIterator = nodes.iterator();
 			while (nodesIterator.hasNext()) {
@@ -116,7 +116,7 @@ ExpandableListView.OnGroupExpandListener {
 				adapter.changeAvailability(addr, availability);
 				adapter.addNode(addr);
 			}
-			
+
 
 			mListChangeHandler.sendEmptyMessage(0);
 		}
@@ -148,34 +148,10 @@ ExpandableListView.OnGroupExpandListener {
 		//registerForContextMenu(getExpandableListView());
 	}
 
-	protected void onConnected(){
-	}
-
-	protected void onDisconnected(){
-	}
 
 
-	@Override
-	protected void onConnectedToEpicNetwork() {
-		try {
-			mEpicService.registerPresenceStatusChangeCallback(mPresenceCallback );
-			NetworkNode[] nodes = mEpicService.getNetworkNodes();
-			if(nodes==null){
-				return;
-			}
-			for(int i=0; i<nodes.length; i++){
-				if(nodes[i].mAddress !=null){
-					String address = nodes[i].mAddress.getFullAddressString();
-					if((address!=null)&&(address.length()>0)){
-						mMapNetworkNodes.put(nodes[i].mAddress.getFullAddressString(), nodes[i]);
-					}
-				}
-			}
-			mListChangeHandler.sendEmptyMessage(0);
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
-	}
+
+
 
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		menu.setHeaderTitle("Sample menu");
@@ -195,7 +171,7 @@ ExpandableListView.OnGroupExpandListener {
 			int childPosition, long id) {
 
 		EpicCommandInfoImpl info = ((MyExpandableListAdapter) mAdapter).getChildEpicCommandInfo(groupPosition, childPosition);
-		
+
 		Intent intent = new Intent(ExploreEpicNetwork.this, RemoteUserInterfaceActivity.class);
 		intent.putExtra(RemoteUserInterfaceActivity.EXTRAS_NODE_FULLADDRESS, info.getEpicNodeId());
 		intent.putExtra(RemoteUserInterfaceActivity.EXTRAS_COMMAND_ID, info.getEpicCommandId());
@@ -393,12 +369,12 @@ ExpandableListView.OnGroupExpandListener {
 			mMapAvailability.put(node, available);
 		}
 
-		
+
 		public void addCommand(String node, EpicCommandInfoImpl command) {
 			if(node==null){
 				return;
 			}
-			
+
 			if(!mNodes.contains(node)) {
 				mNodes.add(node);
 			}
@@ -412,7 +388,7 @@ ExpandableListView.OnGroupExpandListener {
 			if(command==null) {
 				return;
 			}
-				
+
 			if(!list.containsKey(command)){
 				list.put(command.getEpicCommandId(),command);
 			}
@@ -438,7 +414,7 @@ ExpandableListView.OnGroupExpandListener {
 			return childPosition;
 		}
 
-		
+
 		public int getChildrenCount(int groupPosition) {
 			SortedMap<String, EpicCommandInfoImpl> list = mMapCommands.get(mNodes.get(groupPosition));
 			if(list==null){
@@ -472,7 +448,7 @@ ExpandableListView.OnGroupExpandListener {
 			return mNodes.get(groupPosition);
 		}
 
-		
+
 		public int getGroupCount() {
 			return mNodes.size();
 		}
@@ -507,6 +483,51 @@ ExpandableListView.OnGroupExpandListener {
 			return true;
 		}
 
+
+	}
+
+	@Override
+	protected void onConnected() {
+		// TODO Auto-generated method stub
+
+	}
+
+
+
+
+
+
+	@Override
+	protected void onConnectedToEpicNetwork() {
+		try {
+			mEpicService.registerPresenceStatusChangeCallback(mPresenceCallback );
+			NetworkNode[] nodes = mEpicService.getNetworkNodes();
+			if(nodes==null){
+				return;
+			}
+			for(int i=0; i<nodes.length; i++){
+				if(nodes[i].mAddress !=null){
+					String address = nodes[i].mAddress.getFullAddressString();
+					if((address!=null)&&(address.length()>0)){
+						mMapNetworkNodes.put(nodes[i].mAddress.getFullAddressString(), nodes[i]);
+					}
+				}
+			}
+			mListChangeHandler.sendEmptyMessage(0);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+
+
+
+
+
+	@Override
+	protected void onDisconnected() {
+		// TODO Auto-generated method stub
 
 	}
 

@@ -180,8 +180,12 @@ public class BrowserHistoryProviderActivity extends ApplicationActivity{
 	@Override
 	protected void onConnected() {
 		Log.d(CLASS_TAG, "connected to the service");
-		if(mEpicService.isConnectedToEpicNetwork()){
-			sendMessage();
+		try {
+			if(mEpicService.isConnectedToEpicNetwork()){
+				sendMessage();
+			}
+		} catch (RemoteException e) {
+			e.printStackTrace();
 		}
 	}
 

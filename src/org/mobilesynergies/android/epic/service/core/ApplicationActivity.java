@@ -2,6 +2,7 @@ package org.mobilesynergies.android.epic.service.core;
 
 import org.mobilesynergies.android.epic.service.EpicService;
 import org.mobilesynergies.android.epic.service.core.states.EpicServiceState;
+import org.mobilesynergies.android.epic.service.core.states.EpicServiceStateChangeManager;
 
 import org.mobilesynergies.android.epic.service.interfaces.IEpicServiceApplicationInterface;
 import org.mobilesynergies.android.epic.service.interfaces.IServiceStatusChangeCallback;
@@ -30,7 +31,7 @@ public abstract class ApplicationActivity extends Activity {
 	/** 
 	 * The application interface to call methods of the {@link EpicService} 
 	 */
-	protected ApplicationInterface mEpicService = null;
+	protected IEpicServiceApplicationInterface mEpicService = null;
 	
 	/** 
 	 * True if the android.os.service (not to be confused with the EpicService) is bound successfully.
@@ -107,7 +108,7 @@ public abstract class ApplicationActivity extends Activity {
 			// service through an IDL interface, so get a client-side
 			// representation of that from the raw service object.
 
-			mEpicService = (ApplicationInterface) IEpicServiceApplicationInterface.Stub.asInterface(service);
+			mEpicService = (IEpicServiceApplicationInterface) IEpicServiceApplicationInterface.Stub.asInterface(service);
 			mIsBound = true;
 			try {
 				mEpicService.registerServiceStatusChangeCallback(mServiceStatusChangeCallback);
@@ -132,7 +133,7 @@ public abstract class ApplicationActivity extends Activity {
 		@Override
 		public void onServiceStatusChanged(int status)
 				throws RemoteException {
-			if(status==EpicServiceState.STATE_AUTHENTICATED) {
+			if(status==EpicServiceState.EPICNETWORKCONNECTION) {
 				onConnectedToEpicNetwork();
 			} 
 		}
