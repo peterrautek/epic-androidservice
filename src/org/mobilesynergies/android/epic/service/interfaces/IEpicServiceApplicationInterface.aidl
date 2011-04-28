@@ -18,12 +18,9 @@ interface IEpicServiceApplicationInterface {
 		
 		void sendMessage(in String action, in String sessionid, in ParameterMapImpl map);
 		
-		/**
-		* Call to get information if the client is connected to the EPIC network.
-		*
-		* @return True if the client is connected and authenticated at the server. False otherwise (no internet connection, not connected to the server, not authenticated at the server)
-		*/  
-		boolean isConnectedToEpicNetwork();
+		int getState();
+		
+		void stop();
 	
 		
 	

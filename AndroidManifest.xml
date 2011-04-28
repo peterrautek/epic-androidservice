@@ -3,8 +3,6 @@
 	package="org.mobilesynergies.android.epic.service" android:versionCode="1"
 	android:versionName="1.0">
 
-
-
 	<permission android:label="@string/permission_label_receiveMessages"
 		android:description="@string/permission_description_receiveMessages"
 		android:permissionGroup="android.permission-group.MESSAGES"
@@ -18,14 +16,16 @@
 		android:name="org.mobilesynergies.android.epic.permission.sendmessages" />
 
 	<application android:icon="@drawable/icon" android:label="@string/app_name" android:debuggable="true">
-	
-				
 		<activity android:name=".remoteui.RemoteUserInterfaceActivity"
 			android:label="@string/app_name">
 		</activity>
 		
-		<activity android:name=".administration.LogActivity"
-			android:label="@string/app_name" android:launchMode="singleTop">
+		<activity android:name=".administration.LogActivity" android:label="@string/app_name" android:launchMode="singleTop">
+		<intent-filter>
+				<action android:name="org.mobilesynergies.android.epic.service.log"/>
+				<category android:name="android.intent.category.DEFAULT" />
+		</intent-filter>
+		
 		</activity>
 		
 		<activity android:name=".application.BrowserHistoryProviderActivity"
@@ -77,6 +77,7 @@
 			android:label="@string/app_name">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
+				<category android:name="android.intent.category.DEFAULT" />
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 			
@@ -109,6 +110,9 @@
 	<uses-permission android:name="android.permission.INTERNET"></uses-permission>
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"></uses-permission>
 	<uses-permission android:name="com.android.browser.permission.READ_HISTORY_BOOKMARKS"></uses-permission>
+	<uses-permission android:name="android.permission.VIBRATE"></uses-permission>
+	<uses-permission android:name="android.permission.DISABLE_KEYGUARD"></uses-permission>
+	<uses-permission android:name="android.permission.WAKE_LOCK"></uses-permission>
 	<uses-permission android:name="org.mobilesynergies.android.epic.permission.sendmessages"></uses-permission>
 	
 	

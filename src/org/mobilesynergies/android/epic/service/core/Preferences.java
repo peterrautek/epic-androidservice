@@ -155,7 +155,8 @@ public final class Preferences {
     }
     
     public static void log(Context context, String tag, String message){
-    	SharedPreferences log = getLog(context);
+    	//disabled for release
+    	/*SharedPreferences log = getLog(context);
     	SharedPreferences.Editor editor = log.edit();
     	Date date = new Date(System.currentTimeMillis());
     	String logmessage = date.toGMTString() + "\n" +
@@ -164,7 +165,7 @@ public final class Preferences {
     	index = log.getInt("counter", 0);
 		editor.putString("log"+index, logmessage);
 		editor.putInt("counter", index+1);
-		editor.commit();
+		editor.commit();*/
     }
 
 	public static String[] getLogItems(Context context) {

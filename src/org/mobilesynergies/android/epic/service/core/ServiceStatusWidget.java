@@ -41,8 +41,8 @@ public class ServiceStatusWidget extends AppWidgetProvider{
 		views.setTextViewText(R.id.definition, state);
 
 		// When user clicks on widget, launch log activity
-		Intent intent = new Intent();
-		intent.setClassName("org.mobilesynergies.android.epic.service.administration", LogActivity.class.getCanonicalName());
+		Intent intent = new Intent("android.intent.action.MAIN");
+		intent.setClassName("org.mobilesynergies.android.epic.service", MainActivity.class.getCanonicalName());
 		PendingIntent pendingIntent = PendingIntent.getActivity(context,
 				0 /* no requestCode */, intent, 0 /* no flags */);
 		views.setOnClickPendingIntent(R.id.widget, pendingIntent);

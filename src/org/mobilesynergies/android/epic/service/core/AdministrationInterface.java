@@ -114,16 +114,6 @@ public class AdministrationInterface extends IEpicServiceAdministrationInterface
 
 
 	@Override
-	public boolean isConnectedToEpicNetwork() {
-		if(mEpicServiceContext==null) {
-			return false;
-		}
-		return mEpicServiceContext.isConnectedToEpicNetwork();
-	}
-
-
-
-	@Override
 	public EpicCommandInfoImpl[] getRemoteCommands(String epicNode) throws RemoteException {
 		if(mEpicServiceContext==null) {
 			return null;
@@ -136,6 +126,14 @@ public class AdministrationInterface extends IEpicServiceAdministrationInterface
 			e.printStackTrace();
 		}
 		return null;		
+	}
+
+
+
+	@Override
+	public int getState() throws RemoteException {
+		return mEpicServiceContext.getState();
+		
 	}
 
 

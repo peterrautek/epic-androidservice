@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.mobilesynergies.android.epic.service.core.ApplicationActivity;
+import org.mobilesynergies.android.epic.service.core.states.EpicServiceState;
 import org.mobilesynergies.android.epic.service.interfaces.ParameterMapImpl;
 import org.mobilesynergies.epic.client.remoteui.ArrayParameter;
 import org.mobilesynergies.epic.client.remoteui.Parameter;
@@ -47,7 +48,7 @@ public class BrowserHistoryProviderActivity extends ApplicationActivity{
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		Intent callingIntent = getIntent();
+		Intent callingIntent = getIntent(); 
 		Bundle b = callingIntent.getExtras();
 		if(b!=null){
 			mSessionId  = b.getString("session");
@@ -181,7 +182,9 @@ public class BrowserHistoryProviderActivity extends ApplicationActivity{
 	protected void onConnected() {
 		Log.d(CLASS_TAG, "connected to the service");
 		try {
-			if(mEpicService.isConnectedToEpicNetwork()){
+			int state = mEpicService.getState();
+			
+			if(state == EpicServiceState.EPICNETWORKCONNECTION){
 				sendMessage();
 			}
 		} catch (RemoteException e) {

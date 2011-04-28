@@ -62,30 +62,10 @@ public class EpicService extends Service {
 	private ServiceStatusWidget mWidget = new ServiceStatusWidget();
 	private HashMap<String, String> mMapSessionIdToPeer = new HashMap<String, String>(); 
 
-	/*
-	 * private class StateChangeHandler extends Handler {
-		@Override
-		public void handleMessage(Message msg) {
-			super.handleMessage(msg);
-			int state = msg.what;
-			mServiceStateObject.changeState(state);			
-			Preferences.log(EpicService.this, "StateChangeHandler", "Status changed: " + mServiceStateObject.getStateAsHumanReadableString(state));
-			mWidget.update(EpicService.this, mServiceStateObject.getStateAsHumanReadableString());
-		}		
-	}
-	 */
-
-
+	
 	EpicServiceStateChangeManager mServiceStateChangeManager = new EpicServiceStateChangeManager();
 
-	/** 
-	 * Thread that is run whenever the service needs to connect to the xmpp server
-	 */
-	//private ConnectionThread mConnectionThread = null; 
-
-
-	//private StateChangeHandler mStateChangeHandler = new StateChangeHandler();
-
+	
 	/**
 	 * The implementation of the application interface
 	 */
@@ -102,6 +82,14 @@ public class EpicService extends Service {
 	 * Identifying the version number of the epic standard that is implemented with this service
 	 */
 	public static final int EPIC_SERVICE_VERSION_NUMBER = 1;
+	
+	protected static final int STATECHANGE_OK = 0;
+	protected static final int STATECHANGE_NONETWORK = -1;
+	protected static final int STATECHANGE_NOSERVERCONNECTION = -2;
+	protected static final int STATECHANGE_AUTHFAIL = -3;
+	protected static final int STATECHANGE_XMPPERROR = -4;
+	protected static final int STATECHANGE_STOP = -5;
+	
 
 
 
@@ -120,7 +108,7 @@ public class EpicService extends Service {
 		//first check if the user is already registered
 		if(Preferences.isRegistered(this)){
 			//registered -> try to connect with the network
-			handleStateChanges.sendEmptyMessage(0);
+			handleStateChanges.sendEmptyMessage(STATECHANGE_OK);
 		}/* else{
 			Intent registerIntent = new Intent();
 			registerIntent.setClassName(this.getPackageName(), LoginActivity.class.getCanonicalName());
@@ -136,7 +124,7 @@ public class EpicService extends Service {
 		@Override
 		public boolean handleMessage(String from, String action, String sessionid, String packageName, String className, ParameterMap data) {
 
-			if((action==null)||(action.length()==0)){
+			if((action==null)||(action.trim().length()==0)){
 				return false;
 			}
 
@@ -173,7 +161,7 @@ public class EpicService extends Service {
 				startActivity(intent);
 			} catch(ActivityNotFoundException e) {
 				//we cannot resolve it 
-				//we can also not automatically install it 
+				//we cannot automatically install it 
 				//-> we point the user to the market
 				Intent marketIntent = new Intent();
 				marketIntent.setAction(Intent.ACTION_VIEW);
@@ -186,16 +174,6 @@ public class EpicService extends Service {
 		}
 	};
 
-	private boolean isConnectedToInternet(){
-
-		ConnectivityManager cm =  (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-		NetworkInfo info = cm.getActiveNetworkInfo();
-		boolean isconnected = false;
-		if(info!=null){
-			isconnected = info.isConnected();
-		}
-		return isconnected;		
-	}
 
 	/** Called when the service is started.
 	 * The service is either started by an application (respectively the user), or by the NetworkConnectivityStatusReceiver.
@@ -206,41 +184,115 @@ public class EpicService extends Service {
 		//first check if the user is already registered
 		if(Preferences.isRegistered(this)){
 			//registered -> try to connect with the network
-			handleStateChanges.sendEmptyMessage(0);
+			handleStateChanges.sendEmptyMessage(STATECHANGE_OK);
 		} else{
-			//not doing anything - the onstart might be called because the network connectivity changed
+			//the onstart might be called because the network connectivity changed
 			//it would be very disturbing if the user had to register only because of internet connectivity change
+			//however we inform the widget that the user is not registered yet:
+			int state = mState.updateState(EpicService.this, mEpicClient); 
+			String logmessage = EpicServiceState.getStateAsHumanReadableString(state);
+			mWidget.update(EpicService.this, logmessage);
+
 		}
 	}
-
+	
+	
+	
 	@Override
 	public void onDestroy() {
 		Preferences.log(this, CLASS_TAG, "service destroyed");
+		/*if(mEpicClient!=null){
+			mEpicClient.disconnect();
+		}*/		
+		
+		
+
 	}
 
+	EpicServiceState mState = new EpicServiceState();
 
 	Handler handleStateChanges = new Handler() {
 
-
-		Timer mConnectionTimer = null;
-		Timer mAuthenticationTimer = null;
-
-		EpicServiceState mState = new EpicServiceState();
-
 		public void handleMessage(Message msg) {
-			stateChange();
+			//if other ok messages are pending we delete them
+			this.removeMessages(STATECHANGE_OK);
+			
+			if(msg.what==STATECHANGE_OK){
+				stateChange();
+			} else {
+				switch(msg.what){
+				case STATECHANGE_STOP:{
+					int state = EpicServiceState.STOPPED;
+					mState.setState(state);
+					String logmessage = EpicServiceState.getStateAsHumanReadableString(state);
+					mWidget.update(EpicService.this, logmessage);
+					mServiceStateChangeManager.sendStateChangeToListeners(state);
+					if(mEpicClient!=null){
+						mEpicClient.disconnect();
+					}
+					mEpicClient = null;
+					stopSelf();
+				}
+				case STATECHANGE_XMPPERROR:{
+					int state = EpicServiceState.ERROR_XMPPERROR;
+					mState.setState(state);
+					String logmessage = EpicServiceState.getStateAsHumanReadableString(state);
+					mWidget.update(EpicService.this, logmessage);
+					mServiceStateChangeManager.sendStateChangeToListeners(state);
+					if(mEpicClient!=null){
+						mEpicClient.disconnect();
+					}
+					//try to recover
+					//mState.setState(EpicServiceState.UNINITIALIZED);
+					//handleStateChanges.sendEmptyMessage(STATECHANGE_OK);
+					break;
+				}
+				case STATECHANGE_NONETWORK:{
+					//inform the widget and the state change listeners
+					int state = EpicServiceState.ERROR_NONETWORK;
+					mState.setState(state);
+					String logmessage = EpicServiceState.getStateAsHumanReadableString(state);
+					mWidget.update(EpicService.this, logmessage);
+					mServiceStateChangeManager.sendStateChangeToListeners(state);
+					//wait for the NetworkConnectivityStatusReceiver to change the state again
+					}
+					break;
+				case STATECHANGE_AUTHFAIL:{
+					//inform the widget and the state change listeners
+					int state = EpicServiceState.ERROR_AUTHFAIL;
+					mState.setState(state);
+					String logmessage = EpicServiceState.getStateAsHumanReadableString(state);
+					mWidget.update(EpicService.this, logmessage);
+					mServiceStateChangeManager.sendStateChangeToListeners(state);
+					//wait for the MainActivity to start the service again
+					}
+					break;
+				case STATECHANGE_NOSERVERCONNECTION:{
+					//inform the widget and the state change listeners
+					int state = EpicServiceState.ERROR_NOSERVER;
+					mState.setState(state);
+					String logmessage = EpicServiceState.getStateAsHumanReadableString(state);
+					mWidget.update(EpicService.this, logmessage);
+					mServiceStateChangeManager.sendStateChangeToListeners(state);
+					//wait for the MainActivity to start the service again
+					}
+					break;
+				}
+			}
 		};
 
 		private void stateChange() {
 
-			int oldState = mState.state;
-			int newState = currentState(); 
+			int oldState = mState.getState();
 
-			String logmessage = EpicServiceState.getStateAsHumanReadableString(newState);
+			//set the new state
+			int state = mState.updateState(EpicService.this, mEpicClient); 
+
+			String logmessage = EpicServiceState.getStateAsHumanReadableString(state);
 
 			mWidget.update(EpicService.this, logmessage);
 
-			if(newState==oldState){
+			if(state==oldState){
 				//nothing to do!
 				Preferences.log(EpicService.this, CLASS_TAG, "oldstate == newstate");
 				//return;
@@ -252,70 +304,42 @@ public class EpicService extends Service {
 			logmessage = "New State: " + logmessage;
 			Preferences.log(EpicService.this, CLASS_TAG, logmessage);
 
-			//cancel timers
-			/*
-			if(mConnectionTimer!=null)
-			{
-				mConnectionTimer.cancel();
-				mConnectionTimer = null;
-			}
-			if(mAuthenticationTimer!=null)
-			{
-				mAuthenticationTimer.cancel();
-				mAuthenticationTimer = null;
-			}*/
 
 			//send the new state to state listeners
-			mServiceStateChangeManager.sendStateChangeToListeners(mState.state);
+			mServiceStateChangeManager.sendStateChangeToListeners(state);
 
-			//set the new state
-			mState.state = newState;
 
 			//handle the new state
-			switch(newState){
+			switch(state){
 			case EpicServiceState.INITIALIZING:
 				initEpicClient();
 				break;
-			case EpicServiceState.NONETWORKCONNECTION:
-				//we lost internet connection 
-				//nothing to do
+			//case EpicServiceState.NONETWORKCONNECTION:
+				//we lost internet connection
+				//handleStateChanges.sendEmptyMessage(STATECHANGE_NONETWORK);
 				//the NetworkConnectivityStatusReceiver will trigger a state change
-				break;
+				//break;
 			case EpicServiceState.NETWORKCONNECTION:
 				//we either just got internet connection or lost server connection
 				//anyway we will schedule (re)connection with the server
-				/*if(mConnectionTimer!=null)
-				{
-					mConnectionTimer.cancel();
-				}
-				mConnectionTimer = new Timer();
-				TimerTask connectiontask = new ConnectionTask();
-				mConnectionTimer.schedule(connectiontask, 0, 600000);*/
 				if( ! mEpicClient.isConnected()) {
 					String servername = Preferences.getConfiguredServerName(EpicService.this);
 					String servicename = Preferences.getConfiguredServiceName(EpicService.this);
 					try {
 						if(mEpicClient.establishConnection(servername, servicename)){
 							Preferences.log(EpicService.this, "ConnectionThread", "succeeded.");
+							handleStateChanges.sendEmptyMessage(STATECHANGE_OK);
 						} else {
 							Preferences.log(EpicService.this, "ConnectionThread", "failed.");
+							handleStateChanges.sendEmptyMessage(STATECHANGE_NOSERVERCONNECTION);
 						}
 					} catch (EpicClientException e) {
 						Preferences.log(EpicService.this, "ConnectionThread", "failed with exception: " +e.getMessage());
+						handleStateChanges.sendEmptyMessage(STATECHANGE_NOSERVERCONNECTION);
 					}
 				}
-				handleStateChanges.sendEmptyMessage(0);
-
 				break;
 			case EpicServiceState.SERVERCONNECTION:
-				/*if(mAuthenticationTimer!=null)
-				{
-					mAuthenticationTimer.cancel();
-				}
-				mAuthenticationTimer = new Timer();
-				TimerTask authenticationtask = new AuthenticationTask();
-				mAuthenticationTimer.schedule(authenticationtask, 0, 600000);*/
-
 				if( ! mEpicClient.isConnectedToEpicNetwork()) {
 
 					String username = Preferences.getUserName(EpicService.this);
@@ -325,44 +349,21 @@ public class EpicService extends Service {
 						String resource = Preferences.getConfiguredDeviceName(EpicService.this);
 						if(mEpicClient.authenticateUser(username, password, resource)){
 							Preferences.log(EpicService.this, "AuthenticationThread", "succeeded.");
+							handleStateChanges.sendEmptyMessage(STATECHANGE_OK);
 						} else {
 							Preferences.log(EpicService.this, "AuthenticationThread", "failed.");
+							handleStateChanges.sendEmptyMessage(STATECHANGE_AUTHFAIL);
 						}
 					} catch (EpicClientException e) {
 						Preferences.log(EpicService.this, "AuthenticationThread", "failed with exception: " +e.getMessage());
+						handleStateChanges.sendEmptyMessage(STATECHANGE_AUTHFAIL);
 					}
 				}
-
-				handleStateChanges.sendEmptyMessage(0);
 				break;
 			case EpicServiceState.EPICNETWORKCONNECTION:
 				//got epic network connection - nothing to do!  
 				break;
 			}
-
-
-
-		}
-
-
-		private int currentState() {
-
-			if(mEpicClient==null){
-				return EpicServiceState.INITIALIZING;
-			}
-
-			int state = EpicServiceState.NONETWORKCONNECTION;
-
-			if(isConnectedToInternet()){
-				state = EpicServiceState.NETWORKCONNECTION;
-			}
-			if(isConnectedToServer()){
-				state = EpicServiceState.SERVERCONNECTION;
-			}
-			if(isConnectedToEpicNetwork()){
-				state = EpicServiceState.EPICNETWORKCONNECTION;
-			}
-			return state;
 		}
 
 
@@ -372,84 +373,22 @@ public class EpicService extends Service {
 			Preferences.log(EpicService.this, CLASS_TAG, "creating new epic client");
 			//register the connectivity callback
 			mEpicClient.registerEpicNetworkConnectivityCallback(new EpicNetworkConnectivityCallback() {
+				
+
 				/**
 				 * connectivity to the epic network changed (server side)
 				 */
 				@Override
 				public void onConnectivityChanged(boolean hasConnectivity) {
-					handleStateChanges.sendEmptyMessage(0);
+					if(!hasConnectivity){
+						handleStateChanges.sendEmptyMessage(STATECHANGE_XMPPERROR);
+					}
 				}
 			});
 
 			mEpicClient.registerEpicMessageCallback(mEpicMessageListener);
-			handleStateChanges.sendEmptyMessage(0);
+			handleStateChanges.sendEmptyMessage(STATECHANGE_OK);
 		}
-
-
-		/**
-		 * Thread that will try to connect to the server 
-		 */
-		/*class ConnectionTask extends TimerTask {
-
-
-			public void run(){
-				if( mEpicClient.isConnected()) {
-					return;
-				}
-
-				String servername = Preferences.getConfiguredServerName(EpicService.this);
-				String servicename = Preferences.getConfiguredServiceName(EpicService.this);
-
-				try {
-					if(mEpicClient.establishConnection(servername, servicename)){
-						Preferences.log(EpicService.this, "ConnectionThread", "succeeded.");
-					} else {
-						Preferences.log(EpicService.this, "ConnectionThread", "failed.");
-					}
-				} catch (EpicClientException e) {
-					Preferences.log(EpicService.this, "ConnectionThread", "failed with exception: " +e.getMessage());
-				}
-				handleStateChanges.sendEmptyMessage(0);
-
-			}
-		};*/
-
-		/**
-		 * Thread that will try to authenticate at the server 
-		 */
-		/*class AuthenticationTask extends TimerTask{
-
-			public void run(){
-				//this thread constantly checks if the client is connected
-				//and tries to establish a connection if necessary 
-				if( mEpicClient.isConnectedToEpicNetwork()) {
-					return;
-				}
-
-				String username = Preferences.getUserName(EpicService.this);
-				String password = Preferences.getUserPassword(EpicService.this);
-
-				try {
-					String resource = Preferences.getConfiguredDeviceName(EpicService.this);
-					if(mEpicClient.authenticateUser(username, password, resource)){
-						Preferences.log(EpicService.this, "AuthenticationThread", "succeeded.");
-					} else {
-						Preferences.log(EpicService.this, "AuthenticationThread", "failed.");
-					}
-				} catch (EpicClientException e) {
-					Preferences.log(EpicService.this, "AuthenticationThread", "failed with exception: " +e.getMessage());
-				}
-
-				handleStateChanges.sendEmptyMessage(0);
-			}
-		};*/
-
-
-
-
-
-
-
 
 
 	};
@@ -497,6 +436,11 @@ public class EpicService extends Service {
 
 		//TODO
 	}
+	
+	public void stop(){
+		handleStateChanges.sendEmptyMessage(STATECHANGE_STOP);
+	}
+
 
 	public void unregisterMessageCallback(String application) {
 		//TODO		
@@ -545,20 +489,7 @@ public class EpicService extends Service {
 	}
 
 
-	public boolean isConnectedToEpicNetwork() {
-		if(mEpicClient==null){
-			return false;
-		}
-		return mEpicClient.isConnectedToEpicNetwork();
-	}
-
-	public boolean isConnectedToServer() {
-		if(mEpicClient==null){
-			return false;
-		}
-		return mEpicClient.isConnected();
-	}
-
+	
 
 
 	public EpicCommandInfo[] getEpicCommands(String epicNode) throws EpicClientException {
@@ -586,6 +517,10 @@ public class EpicService extends Service {
 			return;
 		}
 		mEpicClient.registerPresenceCallback(callback);
+	}
+
+	public int getState() {
+		return mState.getState();
 	}
 
 

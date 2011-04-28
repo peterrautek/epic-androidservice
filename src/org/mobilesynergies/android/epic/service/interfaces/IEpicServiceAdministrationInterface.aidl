@@ -11,6 +11,8 @@ import org.mobilesynergies.android.epic.service.interfaces.EpicCommandInfoImpl;
 	
 		int getVersion();
 		
+		int getState();
+		
 		void registerServiceStatusChangeCallback(in IServiceStatusChangeCallback callback);
 		
 		/**
@@ -35,14 +37,6 @@ import org.mobilesynergies.android.epic.service.interfaces.EpicCommandInfoImpl;
 		 * @return The sessionId of this command. This id is used to later refer to this command.
 		 */          		
 		String executeRemoteCommand(in String epicNode, in String command, in String sessionId, in ParameterMapImpl inParameters, out ParameterMapImpl outParameters);
-		
-		/**
-		* Call to get information if the client is connected to the EPIC network.
-		*
-		* @return True if the client is connected and authenticated at the server. False otherwise (no internet connection, not connected to the server, not authenticated at the server)
-		*/  
-		boolean isConnectedToEpicNetwork();
-		
 		
 		/**
 		 * Get a list of remote commands for one epic node

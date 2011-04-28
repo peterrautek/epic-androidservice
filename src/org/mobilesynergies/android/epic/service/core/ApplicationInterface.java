@@ -3,17 +3,13 @@ package org.mobilesynergies.android.epic.service.core;
 import org.mobilesynergies.android.epic.service.EpicService;
 
 import org.mobilesynergies.android.epic.service.interfaces.IEpicServiceApplicationInterface;
-import org.mobilesynergies.android.epic.service.interfaces.IApplicationStatusChangeCallback;
-import org.mobilesynergies.android.epic.service.interfaces.IRemoteCommandCallback;
 import org.mobilesynergies.android.epic.service.interfaces.IncomingMessageCallbackImpl;
 import org.mobilesynergies.android.epic.service.interfaces.ParameterMapImpl;
 
 import org.mobilesynergies.android.epic.service.interfaces.IIncomingMessageCallback;
 import org.mobilesynergies.android.epic.service.interfaces.IServiceStatusChangeCallback;
 
-import android.os.Bundle;
 import android.os.RemoteException;
-import android.util.Log;
 
 
 /**
@@ -32,13 +28,7 @@ public class ApplicationInterface extends IEpicServiceApplicationInterface.Stub 
 		mEpicServiceContext = context;
 	}
 	
-	@Override
-	public boolean isConnectedToEpicNetwork() {
-		if(mEpicServiceContext==null) {
-			return false;
-		}
-		return mEpicServiceContext.isConnectedToEpicNetwork();
-	}
+	
 	
 	@Override
 	public int getVersion() throws RemoteException {
@@ -72,6 +62,18 @@ public class ApplicationInterface extends IEpicServiceApplicationInterface.Stub 
 	public void unregisterMessageCallback(String application) throws RemoteException {
 		mEpicServiceContext.unregisterMessageCallback(application);
 	}
+	
+	@Override
+	public void stop(){
+		mEpicServiceContext.stop();
+	}
+
+	@Override
+	public int getState() throws RemoteException {
+		return mEpicServiceContext.getState();
+	}
+	
+	
 
 
 
