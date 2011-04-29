@@ -162,7 +162,9 @@ public class EpicService extends Service {
 
 			//since the service does not run in a task, we have to start a new task
 			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-			if(action.equalsIgnoreCase("launch")){
+			Uri datauri = Uri.parse("epic://"+action);
+			intent.setData(datauri);
+			if(action.equalsIgnoreCase("org.epic.action.LaunchApplication")){
 				intent.setClassName(packageName, className);
 			} else {
 				intent.setAction(action);
