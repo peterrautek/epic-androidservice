@@ -37,7 +37,7 @@
 			<intent-filter>
 				<action android:name="org.epic.action.ListBrowserHistory"/>
 				<category android:name="android.intent.category.DEFAULT" />
-				
+				<data android:scheme="epic" />
 			</intent-filter>
 			
 		</activity>
@@ -52,6 +52,7 @@
 			<intent-filter>
 				<action android:name="org.epic.action.RingPhone"/>
 				<category android:name="android.intent.category.DEFAULT" />
+				<data android:scheme="epic" />
 			</intent-filter>
 		</activity>
 

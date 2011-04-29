@@ -1,6 +1,7 @@
 package org.mobilesynergies.android.epic.service;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -39,6 +40,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
 /**
@@ -131,14 +134,16 @@ public class EpicService extends Service {
 			mMapSessionIdToPeer.put(sessionid, from);
 
 			Bundle b = new Bundle();
-			b.putString("action", action);
-			b.putString("session", sessionid);
-			b.putString("class", className);
-			b.putString("package", packageName);
-
-			Intent intent = new Intent();
+						
 			if(data!=null){
-				b.putParcelable("data", new ParameterMapImpl(data));
+				//Parcel p = Parcel.obtain();
+				//Map map = data.getMap();
+				//if(map!=null){
+					//p.writeMap(map);
+				//}
+			//	Parcelable p1 = new Parcelable();
+		//		b.putParcel("data", p);
+				
 				/*Set<String> keys = message.keySet();
 				Iterator<String> iterKeys = keys.iterator();
 				while(iterKeys.hasNext()){
@@ -147,6 +152,12 @@ public class EpicService extends Service {
 				}*/
 
 			}
+			b.putString("action", action);
+			b.putString("session", sessionid);
+			b.putString("class", className);
+			b.putString("package", packageName);
+
+			Intent intent = new Intent();
 			intent.putExtras(b);
 
 			//since the service does not run in a task, we have to start a new task
