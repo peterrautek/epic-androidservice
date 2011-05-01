@@ -1,22 +1,16 @@
 package org.mobilesynergies.android.epic.service;
 
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import org.mobilesynergies.android.epic.service.Manifest.permission;
 import org.mobilesynergies.android.epic.service.administration.ConfigurationDatabase;
 import org.mobilesynergies.android.epic.service.administration.ServiceConfigurationActivity;
 import org.mobilesynergies.android.epic.service.core.AdministrationInterface;
 import org.mobilesynergies.android.epic.service.core.ApplicationInterface;
-
 import org.mobilesynergies.android.epic.service.core.Preferences;
 import org.mobilesynergies.android.epic.service.core.ServiceStatusWidget;
 import org.mobilesynergies.android.epic.service.core.states.EpicServiceState;
 import org.mobilesynergies.android.epic.service.core.states.EpicServiceStateChangeManager;
-
 import org.mobilesynergies.android.epic.service.interfaces.IEpicServiceAdministrationInterface;
 import org.mobilesynergies.android.epic.service.interfaces.IEpicServiceApplicationInterface;
 import org.mobilesynergies.android.epic.service.interfaces.IServiceStatusChangeCallback;
@@ -29,26 +23,18 @@ import org.mobilesynergies.epic.client.IncomingMessageCallback;
 import org.mobilesynergies.epic.client.NetworkNode;
 import org.mobilesynergies.epic.client.PresenceCallback;
 import org.mobilesynergies.epic.client.remoteui.EpicCommandInfo;
-import org.mobilesynergies.epic.client.remoteui.ParameterMap;
+import org.mobilesynergies.epic.client.remoteui.Parameter;
 
 import android.app.Service;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
-import android.graphics.drawable.BitmapDrawable;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.util.Log;
 
 /**
@@ -119,10 +105,16 @@ public class EpicService extends Service {
 		if(Preferences.isRegistered(this)){
 			//registered -> try to connect with the network
 			handleStateChanges.sendEmptyMessage(STATECHANGE_OK);
-		}/* else{
-			Intent registerIntent = new Intent();
-			registerIntent.setClassName(this.getPackageName(), LoginActivity.class.getCanonicalName());
-		}*/
+		} else{
+			//the onstart might be called because the network connectivity changed
+			//it would be very disturbing if the user had to register only because of internet connectivity change
+			//however we inform the widget and the statechangelisteners that the user is not registered yet:
+			int state = mState.updateState(EpicService.this, mEpicClient); 
+			String logmessage = EpicServiceState.getStateAsHumanReadableString(state);
+			mWidget.update(EpicService.this, logmessage);
+			mServiceStateChangeManager.sendStateChangeToListeners(state);
+
+		}
 	}
 
 
@@ -132,7 +124,7 @@ public class EpicService extends Service {
 	IncomingMessageCallback mEpicMessageListener = new IncomingMessageCallback() {
 
 		@Override
-		public boolean handleMessage(String from, String action, String sessionid, String packageName, String className, ParameterMap data) {
+		public boolean handleMessage(String from, String action, String sessionid, String packageName, String className, Parameter data) {
 
 			if((action==null)||(action.trim().length()==0)){
 				return false;
@@ -198,6 +190,12 @@ public class EpicService extends Service {
 			mMapSessionIdToPeer.put(sessionid, from);
 			Bundle b = new Bundle();
 			if(data!=null){
+				String type = data.getType();
+				String xml = data.asXml("data");
+				Log.d(CLASS_TAG, xml);
+				ParameterMapImpl map = new ParameterMapImpl();
+				map.putParameter("data", data);
+				//b.putParcelable("data", map);
 				//TODO put data in the bundle
 				//Parcel p = Parcel.obtain();
 				//Map map = data.getMap();
@@ -256,10 +254,11 @@ public class EpicService extends Service {
 		} else{
 			//the onstart might be called because the network connectivity changed
 			//it would be very disturbing if the user had to register only because of internet connectivity change
-			//however we inform the widget that the user is not registered yet:
+			//however we inform the widget and the statechangelisteners that the user is not registered yet:
 			int state = mState.updateState(EpicService.this, mEpicClient); 
 			String logmessage = EpicServiceState.getStateAsHumanReadableString(state);
 			mWidget.update(EpicService.this, logmessage);
+			mServiceStateChangeManager.sendStateChangeToListeners(state);
 
 		}
 	}

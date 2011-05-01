@@ -42,16 +42,20 @@
 		
 		<activity android:name=".application.BrowserHistoryProviderActivity"
 			android:label="@string/app_name" android:launchMode="singleTop" android:screenOrientation="portrait">
-			<!--  intent-filter>
-				<action android:name="android.intent.action.MAIN" />
-				<category android:name="android.intent.category.LAUNCHER" />
-			</intent-filter-->
 			<intent-filter>
 				<action android:name="org.epic.action.ListBrowserHistory"/>
 				<category android:name="android.intent.category.DEFAULT" />
 				<data android:scheme="epic" />
 			</intent-filter>
-			
+		</activity>
+
+		<activity android:name=".application.ListEpicActionsActivity"
+			android:label="@string/app_name" android:launchMode="singleTop" android:screenOrientation="portrait">
+			<intent-filter>
+				<action android:name="org.epic.action.ListActions"/>
+				<category android:name="android.intent.category.DEFAULT" />
+				<data android:scheme="epic" />
+			</intent-filter>
 		</activity>
 		
 		
