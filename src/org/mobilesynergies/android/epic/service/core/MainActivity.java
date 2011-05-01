@@ -1,6 +1,7 @@
 package org.mobilesynergies.android.epic.service.core;
 
 import org.mobilesynergies.android.epic.service.R;
+
 import org.mobilesynergies.android.epic.service.administration.LogActivity;
 import org.mobilesynergies.android.epic.service.administration.ServiceConfigurationActivity;
 import org.mobilesynergies.android.epic.service.core.states.EpicServiceState;
@@ -8,10 +9,13 @@ import org.mobilesynergies.android.epic.service.interfaces.IEpicServiceApplicati
 import org.mobilesynergies.android.epic.service.interfaces.IServiceStatusChangeCallback;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -42,9 +46,14 @@ public class MainActivity extends Activity{
 
 	private static final int REQUESTCODE_LOGINACTIVITY = 123;   
 
+	private static String EULA = "EULA - End-User Software License Agreement for the 'EPIC Service'-Android application.\n PLEASE CAREFULLY READ THE FOLLOWING LEGAL AGREEMENT (\"AGREEMENT\") FOR THE LICENSE OF THE EPIC SERVICE ANDROID APPLICATION (\"SOFTWARE\"). BY USING THE SOFTWARE, YOU (EITHER AN INDIVIDUAL OR A SINGLE ENTITY) CONSENT TO BE BOUND BY AND BECOME A PARTY TO THIS AGREEMENT. IF YOU DO NOT AGREE TO ALL OF THE TERMS OF THIS AGREEMENT, YOU MUST NOT USE THE SOFTWARE.\n\n1.License Grant.\nThe EPIC SERVICE APPLICATION, belonging to Peter Rautek, grants to you a non-exclusive, non-transferable License to use the Software for beta testing purposes (personal or business) provided you do not remove any of the original proprietary, trademark or copyright markings or notices placed upon or contained with the Software.\n\n2. Term.\nThis Agreement is effective for an interim period whilst the software remains in a beta state. \n\n3. Fees.\nThere is no License fee for the Software whilst being used on a non-profit basis by individuals, non-profit organizations or businesses for beta testing purposes.\n\n4. Warranty Disclaimer.\nTHE SOFTWARE IS PROVIDED ON AN \"AS IS\" BASIS. TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, PETER RAUTEK DISCLAIMS ALL WARRANTIES, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE AND NONINFRINGEMENT. YOU ASSUME RESPONSIBILITY FOR SELECTING THE SOFTWARE TO ACHIEVE YOUR INTENDED RESULTS, AND FOR THE USE OF, AND RESULTS OBTAINED FROM THE SOFTWARE. PETER RAUTEK MAKES NO WARRANTY THAT THE SOFTWARE WILL BE FREE FROM DEFECTS OR THAT THE SOFTWARE WILL MEET YOUR REQUIREMENTS. SOME JURISDICTIONS DO NOT ALLOW LIMITATIONS ON IMPLIED WARRANTIES, SO THE ABOVE LIMITATION MAY NOT APPLY TO YOU.\n\n5. Limitation of Liability.\nTO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, UNDER NO CIRCUMSTANCES AND UNDER NO LEGAL THEORY, WHETHER IN TORT, CONTRACT, OR OTHERWISE, SHALL PETER RAUTEK OR ITS SUPPLIERS OR RESELLERS BE LIABLE TO YOU OR TO ANY OTHER PERSON FOR ANY INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES OF ANY CHARACTER ARISING OUT OF THE USE OF OR INABILITY TO USE THE SOFTWARE, INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF GOODWILL, COMPUTER FAILURE OR MALFUNCTION, WORK STOPPAGE OR FOR ANY AND ALL OTHER DAMAGES OR LOSSES. IN NO EVENT WILL PETER RAUTEK BE LIABLE FOR ANY DAMAGES IN EXCESS OF THE LIST PRICE PETER RAUTEK CHARGES FOR A LICENSE TO THE SOFTWARE, EVEN IF PETER RAUTEK SHALL HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. SOME JURISDICTIONS DO NOT ALLOW THE EXCLUSION OR LIMITATION OF INCIDENTAL OR CONSEQUENTIAL DAMAGES, SO THIS LIMITATION AND EXCLUSION MAY NOT APPLY TO YOU.\n\n6. Further Limitation of Liability.\nTHE SOFTWARE IS NOT DESIGNED FOR USE IN HAZARDOUS ENVIRONMENTS REQUIRING FAIL-SAFE PERFORMANCE. PETER RAUTEK EXPRESSLY DISCLAIMS ANY EXPRESS OR IMPLIED WARRANTY OF FITNESS FOR HIGH-RISK ACTIVITIES. YOU AGREE THAT PETER RAUTEK WILL NOT BE LIABLE FOR ANY CLAIMS OR DAMAGES ARISING FROM THE USE OF THE SOFTWARE IN SUCH APPLICATIONS.\n\n7. Miscellaneous.\nThis Agreement is governed by the law of the Austrian Republic and the parties agree that the sole location and venue for any litigation which may arise hereunder shall be Austria. This Agreement sets forth all rights for the user of the Software and is the entire agreement between the parties. This Agreement may not be modified except by a written addendum issued by a duly authorized representative of Peter Rautek. No provision hereof shall be deemed waived unless such waiver shall be in writing and signed by Peter Rautek or a duly authorized representative of Peter Rautek. If any provision of this Agreement is held illegal or unenforceable by a court having jurisdiction, such provision shall be modified to the extent necessary to render it enforceable without losing its intent, or severed from this Agreement if no such modification is possible, and the remainder of this Agreement shall continue in full force and effect. The parties confirm that it is their wish that this Agreement has been written in the English language only.";
+
+	private int mCurrentState = EpicServiceState.UNKNOWN;
+
+
 	Handler handlerUpdateUi = new Handler(){
 		public void handleMessage(android.os.Message msg) {
-			updateUI();
+			updateUi(mCurrentState);
 		};
 	};
 
@@ -56,13 +65,61 @@ public class MainActivity extends Activity{
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.main);
+
+		boolean firstrun = Preferences.isFirstRun(MainActivity.this);
+		if (firstrun) {
+			new AlertDialog.Builder(MainActivity.this)
+			.setTitle("Welcome to the EPIC Service!")
+			.setMessage("EPIC is a protocol that lets your phone talk to other devices (like your PC). " +
+					"To use this software you must agree to the following End User Licence Agreement (EULA)." +
+					"\n\n\n"+EULA).setNeutralButton("Agree", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int whichButton) {
+							Preferences.setIsFirstRun(MainActivity.this, false);
+						}
+					})
+					.show();
+		}
+
+		TextView tvHelp = (TextView)findViewById(R.id.TextViewHelp);
+		tvHelp.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				String text = MainActivity.this.getInternalStateAndHintMessage(mCurrentState);
+				new AlertDialog.Builder(MainActivity.this)
+				.setTitle("Help")
+				.setMessage(text).setNeutralButton("OK", null)
+				.show();
+			}
+		});
+
+		TextView tvMailUrl = (TextView)findViewById(R.id.TextViewMailUrl);
+		tvMailUrl.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				new AlertDialog.Builder(MainActivity.this)
+				.setTitle("Send link via email")
+				.setMessage("You need to register and login from your PC to try the EPIC demo applications.").setNeutralButton("Send me the link!", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						Intent i = new Intent(Intent.ACTION_SEND);
+						i.setType("message/rfc822");
+						i.putExtra(Intent.EXTRA_SUBJECT, "EPIC: link to the webpage!");
+						i.putExtra(Intent.EXTRA_TEXT, "Go to: http://www.mobilesynergies.org/. Enjoy the EPIC services! ");
+						startActivity(Intent.createChooser(i, "Email link"));  
+					}
+				})
+				.show();
+			}
+		});
+
+
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-		updateUI();
-		startService();
+		updateUi(mCurrentState);
+		startEpicService();
 	}
 
 	@Override
@@ -103,108 +160,176 @@ public class MainActivity extends Activity{
 	}
 
 
-	private void updateUI() {
-		mState = (TextView) findViewById(R.id.textviewusername);
-		Button blogin = (Button) findViewById(R.id.buttonAction);
-		blogin.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent intent = new Intent(LoginActivity.INTENTACTION);
+	private void updateUi(int state) {
+		mCurrentState=state;
 
-				startActivityForResult(intent, REQUESTCODE_LOGINACTIVITY);
+		TextView tvState = (TextView) findViewById(R.id.textviewState);
+		tvState.setText(getInternalStateMessage(mCurrentState));
+
+		TextView tvAction = (TextView) findViewById(R.id.TextViewActionArea);
+		tvAction.setText("");
+
+		Button buttonAction = (Button) findViewById(R.id.buttonAction);
+
+		switch(state){
+		case MESSAGEID_PROCESSCRASHED:{
+			tvAction.setText("Please restart the service!");
+			buttonAction.setText("Start Service");
+			buttonAction.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					handleEpicServiceStart.sendEmptyMessage(0);
+				}
+			});
+			break;
+		} 
+		case MESSAGEID_SERVICENOTRUNNING:{
+			buttonAction.setText("Start Service");
+			tvAction.setText("The service was stopped! To make use of it again please restart the service!");
+			buttonAction.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					handleEpicServiceStart.sendEmptyMessage(0);
+				}
+			});
+			break;
+		}
+		case EpicServiceState.EPICNETWORKCONNECTION:{
+			tvAction.setText("If you don't want to use the EPIC service anymore, you might stop it! You will not be able to use the service from your PC anymore!");
+			buttonAction.setText("Stop Service");
+			buttonAction.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					handleEpicServiceStop.sendEmptyMessage(0);
+				}
+			});
+			break;
+		} 
+		case EpicServiceState.NOUSERCREDENTIALS:{
+			tvAction.setText("Please login!");
+			buttonAction.setText("Login");
+			buttonAction.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					Intent intent = new Intent(LoginActivity.INTENTACTION);
+					startActivityForResult(intent, REQUESTCODE_LOGINACTIVITY);
+				}
+			});
+			break;
+		}
+		case EpicServiceState.ERROR_AUTHFAIL:{
+			tvAction.setText("Your username or password is incorrect! Please try to login again!");
+			buttonAction.setText("Login");
+			buttonAction.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					Intent intent = new Intent(LoginActivity.INTENTACTION);
+					startActivityForResult(intent, REQUESTCODE_LOGINACTIVITY);
+				}
+			});
+			break;
+		}
+		case EpicServiceState.ERROR_NOSERVER:{
+			tvAction.setText("The server is not reachable. Maybe your internet connection is broken, or server is not working. Also the server name, service name or server port might be wrongly configured! Please check your internet connection, and try to configure the server settings correctly!");
+			buttonAction.setText("Login");
+			buttonAction.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					Intent intent = new Intent(LoginActivity.INTENTACTION);
+					startActivityForResult(intent, REQUESTCODE_LOGINACTIVITY);
+				}
+			});
+			break;
+		}
+		default:{
+			if(mEpicService==null){
+				buttonAction.setText("Start Service");
+				tvAction.setText("Start the service to make use of it!");
+				buttonAction.setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						handleEpicServiceStart.sendEmptyMessage(0);
+					}
+				});
+			} else {
+
+				tvAction.setText("The EPIC service is not working correctly! You might try to stop and restart it!");
+				buttonAction.setText("Stop Service");
+				buttonAction.setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						handleEpicServiceStop.sendEmptyMessage(0);
+					}
+				});
+
+
+
+
 			}
-		});
+
+
+		}
+		} 
+
+
 	}
 
 
+	Handler handleEpicServiceStop = new Handler(){
+		public void handleMessage(android.os.Message msg) {
+			stopEpicService();
+		};
+	};
+
+	void stopEpicService(){
+		if(mIsBound){
+			try {
+				mEpicService.stop();
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
+			// Detach our existing connection.
+			unbindService(mServiceConnection);
+			mIsBound = false;
+		}
+		mEpicService=null;
+		mStateChangeHandler.sendEmptyMessage(MESSAGEID_SERVICENOTRUNNING);
+	}
+
+
+
+	Handler handleEpicServiceStart = new Handler(){
+		public void handleMessage(android.os.Message msg) {
+			startEpicService();	
+		};
+	};
+
+
+	private void startEpicService() {
+		//String strServiceName = IEpicServiceApplicationInterface.class.getName();
+		Intent intent = new Intent("org.mobilesynergies.EPIC_SERVICE");
+		if(bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE)){
+
+		} else {
+			mStateChangeHandler.sendEmptyMessage(MESSAGEID_SERVICENOTRUNNING);
+		}
+
+	}
 
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		handlerUpdateUi.sendEmptyMessage(0);
 		if(requestCode==REQUESTCODE_LOGINACTIVITY){
-
-			
-			
-			
-			if(mIsBound){
-				try {
-					mEpicService.stop();
-				} catch (RemoteException e) {
-					e.printStackTrace();
-				}
-				// Detach our existing connection.
-				unbindService(mServiceConnection);
-				mIsBound = false;
-			}
-			
-			mEpicService=null;
+			stopEpicService();
+			//restart the service
+			startEpicService();
 		}
-		//restart the service
-		startService();
 	}
-
-
-
-
-	private void startService() {
-
-		if(mEpicService==null){
-			//connect to the service
-			mServiceStartHandler.sendEmptyMessage(0);
-		} else {
-			//we can get the state from the service
-			try {
-				int state = mEpicService.getState();
-				mStateChangeHandler.sendEmptyMessage(state);
-
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				mStateChangeHandler.sendEmptyMessage(MESSAGEID_SERVICENOTRUNNING);
-			}
-
-		}
-
-	}
-
-
-	Handler mServiceStartHandler = new Handler(){
-		public void handleMessage(android.os.Message msg) {
-			//String strServiceName = IEpicServiceApplicationInterface.class.getName();
-			Intent intent = new Intent("org.mobilesynergies.EPIC_SERVICE");
-			if(bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE)){
-
-			} else {
-				mStateChangeHandler.sendEmptyMessage(MESSAGEID_SERVICENOTRUNNING);
-			}
-		}
-
-	};
 
 
 	Handler mStateChangeHandler = new Handler(){
 		public void handleMessage(android.os.Message msg) {
-			String statemessage = "";
-			String hintmessage = "";
-			if(msg.what == MESSAGEID_PROCESSCRASHED){
-				statemessage = "the epic service process crashed unexpectedly";
-				hintmessage = "please try to restart the service";
-			} else if (msg.what == MESSAGEID_SERVICENOTRUNNING){
-				statemessage = "failed to start the epic service process";
-				hintmessage = "please try to restart the service";
-			} else {
-				statemessage = EpicServiceState.getStateAsHumanReadableString(msg.what);
-				hintmessage = EpicServiceState.getStateHint(msg.what); 
-			}
-
-			String message = "State: "+statemessage+" \nHint: "+hintmessage;
-
-			if(msg.what == EpicServiceState.EPICNETWORKCONNECTION){
-				String username = Preferences.getUserName(MainActivity.this);
-				message = message + "\nYou are logged in as: "+username;
-			}
-
-			mState.setText(message);
-
+			mCurrentState = msg.what;
+			updateUi(mCurrentState);
 		};
 
 	};
@@ -229,7 +354,7 @@ public class MainActivity extends Activity{
 				MainActivity.this.mStateChangeHandler.sendEmptyMessage(MESSAGEID_SERVICENOTRUNNING);
 				e.printStackTrace();
 			}
-			//onConnected();
+
 
 		}
 
@@ -241,7 +366,9 @@ public class MainActivity extends Activity{
 			mEpicService = null;
 			mIsBound=false;
 			//onDisconnected();
-			MainActivity.this.mStateChangeHandler.sendEmptyMessage(MESSAGEID_PROCESSCRASHED);
+			if(mCurrentState!=EpicServiceState.STOPPED){
+				MainActivity.this.mStateChangeHandler.sendEmptyMessage(MESSAGEID_PROCESSCRASHED);
+			}
 		}
 	};
 
@@ -265,9 +392,48 @@ public class MainActivity extends Activity{
 	};
 
 
-	TextView mState = null;
+
 	protected IEpicServiceApplicationInterface mEpicService = null;
 	boolean mIsBound = false;
+
+	protected String getInternalStateAndHintMessage(int internalState) {
+		String statemessage = "";
+		String hintmessage = "";
+		if(internalState == MESSAGEID_PROCESSCRASHED){
+			statemessage = "the service process crashed unexpectedly";
+			hintmessage = "please try to restart the service";
+		} else if (internalState == MESSAGEID_SERVICENOTRUNNING){
+			statemessage = "epic service not running";
+			hintmessage = "try to restart the service";
+		} else {
+			statemessage = EpicServiceState.getStateAsHumanReadableString(internalState);
+			hintmessage = EpicServiceState.getStateHint(internalState); 
+		}
+		String message = "The EPIC service is in the following state:\n"+statemessage+" \nHint: "+hintmessage;
+		if(internalState == EpicServiceState.EPICNETWORKCONNECTION){
+			String username = Preferences.getUserName(MainActivity.this);
+			message = message + "\nYou are logged in as: "+username;
+		}
+		return message;
+	}
+
+	protected String getInternalStateMessage(int internalState) {
+		String statemessage = "State: ";
+		if(internalState == MESSAGEID_PROCESSCRASHED){
+			statemessage = statemessage + "the epic service process crashed unexpectedly";
+		} else if (internalState == MESSAGEID_SERVICENOTRUNNING){
+			statemessage = statemessage + "failed to start the epic service process";
+		} else {
+			statemessage = statemessage + EpicServiceState.getStateAsHumanReadableString(internalState);
+		}
+
+		if(internalState == EpicServiceState.EPICNETWORKCONNECTION){
+			String username = Preferences.getUserName(MainActivity.this);
+			statemessage = statemessage + "\nYou are logged in as: "+username;
+		}
+		return statemessage;
+	}
+
 
 
 

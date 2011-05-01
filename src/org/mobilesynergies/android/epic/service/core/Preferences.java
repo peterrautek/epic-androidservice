@@ -186,6 +186,22 @@ public final class Preferences {
 		editor.commit();		
 	}
 
+
+	public static boolean isFirstRun(Context context) {
+		SharedPreferences settings = getServiceSettings(context);
+		boolean firstrun = settings.getBoolean("firstrun", true);
+		return firstrun;
+	}
+
+
+	public static void setIsFirstRun(Context context, boolean firstrun) {
+		SharedPreferences settings = getServiceSettings(context);
+		SharedPreferences.Editor editor = settings.edit();
+		editor.putBoolean("firstrun", firstrun);
+		editor.commit();
+		
+	}
+
 	
 /*
 	public static void setDefaultPackagePermission(Context context, int permission){

@@ -5,17 +5,17 @@
     android:layout_height="fill_parent"
     android:background="@drawable/background" android:clipChildren="true">
     
-<ImageView android:id="@+id/ImageView01" android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/epic_header" android:layout_margin="10dp"></ImageView>
-<LinearLayout android:layout_height="wrap_content" android:id="@+id/LinearLayoutState" android:layout_margin="5dp" android:layout_width="wrap_content"><ImageView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/ImageViewStateIcon" android:background="@drawable/cloud_no"></ImageView><TextView android:text="Loading..." android:layout_width="fill_parent" android:id="@+id/textviewusername" android:layout_height="wrap_content" android:layout_marginLeft="10dp" android:textColor="#333333"></TextView>
+<ImageView android:id="@+id/ImageView01" android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/epic_header" android:layout_margin="10dp"></ImageView><LinearLayout android:layout_height="wrap_content" android:id="@+id/LinearLayoutState" android:layout_margin="5dp" android:orientation="vertical" android:layout_width="fill_parent"><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/TextViewHelp" android:textColor="#1111AA" android:text="need help?" android:layout_marginLeft="10dp" android:layout_gravity="right" android:clickable="true" android:minWidth="40dp" android:maxWidth="80dp"></TextView><TextView android:text="Loading..." android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginLeft="10dp" android:textColor="#333333" android:id="@+id/textviewState"></TextView>
 
 
-<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:clickable="false" android:id="@+id/TextViewHelp" android:textColor="#1111AA" android:text="need help?" android:layout_marginLeft="10dp" android:layout_gravity="right"></TextView>
+
 </LinearLayout>
 
+
 <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="vertical" android:id="@+id/LinearLayoutActionArea" android:layout_margin="20dp">
-<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/TextViewEpicDescription" android:textColor="#333333" android:shadowColor="#111111" android:textSize="12dp" android:text="The EPIC Service lets you connect your PC with your android phone. You can also extend the EPIC services and write your own Android applications and interact with them remotely. EPIC is fast, extensible, free, and completely open source! Try it out at "></TextView>
-<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:clickable="true" android:id="@+id/TextViewMailUrl" android:textColor="#1111AA" android:text="need help?" android:layout_marginLeft="10dp" android:layout_gravity="right"></TextView>
-<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/TextViewActionArea" android:textColor="#333333" android:shadowColor="#111111" android:textSize="12dp" android:text="open source!" android:layout_marginTop="20dp"></TextView>
+<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/TextViewEpicDescription" android:textColor="#333333" android:shadowColor="#111111" android:textSize="12dp" android:text="The EPIC Service lets you connect your PC with your android phone. You can also extend the EPIC services and write your own Android applications and interact with them remotely. EPIC is fast, extensible, free, and completely open source! Try it out at:"></TextView>
+<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:clickable="true" android:id="@+id/TextViewMailUrl" android:textColor="#1111AA" android:text="www.mobilesynergies.org" android:layout_gravity="center_horizontal"></TextView>
+<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/TextViewActionArea" android:textColor="#333333" android:shadowColor="#111111" android:textSize="12dp" android:layout_marginTop="20dp" android:text="Loading..."></TextView>
 <Button android:text="Login" android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/buttonAction" android:minWidth="100dp" android:layout_gravity="center_horizontal" android:layout_marginTop="10dp"></Button>
 
 </LinearLayout>

@@ -300,6 +300,7 @@ public class EpicService extends Service {
 					}
 					mEpicClient = null;
 					stopSelf();
+					break;
 				}
 				case STATECHANGE_XMPPERROR:{
 					int state = EpicServiceState.ERROR_XMPPERROR;
@@ -443,14 +444,14 @@ public class EpicService extends Service {
 			mEpicClient.registerEpicNetworkConnectivityCallback(new EpicNetworkConnectivityCallback() {
 				
 
-				/**
-				 * connectivity to the epic network changed (server side)
-				 */
 				@Override
-				public void onConnectivityChanged(boolean hasConnectivity) {
-					if(!hasConnectivity){
-						handleStateChanges.sendEmptyMessage(STATECHANGE_XMPPERROR);
-					}
+				public void onConnectionClosed() {
+					handleStateChanges.sendEmptyMessage(STATECHANGE_STOP);
+				}
+
+				@Override
+				public void onConnectionClosedOnError() {
+					handleStateChanges.sendEmptyMessage(STATECHANGE_XMPPERROR);
 				}
 			});
 

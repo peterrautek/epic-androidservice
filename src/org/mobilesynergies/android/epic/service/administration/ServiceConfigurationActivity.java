@@ -196,7 +196,7 @@ public class ServiceConfigurationActivity extends Activity {
 		if (first_run) {
 			new AlertDialog.Builder(this)
 			.setTitle("Help")
-			.setMessage("Using Cuckoo allows you to remotely start applications on your device. \nTo control the behaviour of Cuckoo when an application is remotely launched you can set a specific permission for each application. \nBy clicking on an application in the list you change its permission.")
+			.setMessage("Using EPIC allows you to remotely start applications on your device. \nTo control the behaviour of the EPIC service when an application is remotely launched you can set a specific permission for each application. \nBy clicking on an application in the list you change its permission.")
 			.setNeutralButton("Ok", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int whichButton) {
 					SharedPreferences.Editor editor = app_preferences.edit();
@@ -322,7 +322,7 @@ public class ServiceConfigurationActivity extends Activity {
 		case 0:
 			new AlertDialog.Builder(this)
 			.setTitle("Help")
-			.setMessage("Using Cuckoo allows you to remotely start applications on your device. \nTo control the behaviour of Cuckoo when an application is remotely launched you can set a specific permission for each application. \nBy clicking on an application in the list you change its permission.")
+			.setMessage("Using EPIC allows you to remotely start applications on your device. \nTo control the behaviour of the EPIC Service when an application is remotely launched you can set a specific permission for each application. \nBy clicking on an application in the list you change its permission.")
 			.setNeutralButton("Close", new DialogInterface.OnClickListener() {
 
 				public void onClick(DialogInterface dialog, int which) {
