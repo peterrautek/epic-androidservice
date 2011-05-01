@@ -15,6 +15,7 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
 import android.widget.Button;
@@ -41,6 +42,7 @@ public class LoginActivity extends Activity{
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.login);
 
 		updateUI();
@@ -170,9 +172,9 @@ public class LoginActivity extends Activity{
 
 	private void updateUI() {
 
-		Button bsave = (Button) findViewById(R.id.buttonsave);
+		Button bsave = (Button) findViewById(R.id.buttondone);
 		Button bqrcode = (Button) findViewById(R.id.button_qrcode);
-		Button bcancel = (Button) findViewById(R.id.buttoncancel);
+		
 		EditText etusername = (EditText) findViewById(R.id.edittextusername);
 		EditText etpassword = (EditText) findViewById(R.id.edittextpassword);
 
@@ -206,13 +208,7 @@ public class LoginActivity extends Activity{
 		});
 
 
-		bcancel.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				setResult(Activity.RESULT_CANCELED);
-				finish();					
-			}
-		});
+		
 
 
 		String user = Preferences.getUserName(this);

@@ -1,19 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android" 
+android:id="@+id/FrameLayout01" android:background="@drawable/background" android:layout_height="fill_parent" android:layout_width="fill_parent">
+<LinearLayout 
     android:orientation="vertical"
-    android:layout_height="fill_parent" android:layout_width="fill_parent">
+    android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_gravity="center_horizontal" android:scrollbars="vertical">
 
-<LinearLayout android:id="@+id/LinearLayout01" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_gravity="center_horizontal">
+<ImageView android:id="@+id/ImageView01" android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/epic_header" android:layout_margin="10dp"></ImageView><LinearLayout android:id="@+id/LinearLayout01" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_gravity="center_horizontal">
 
 </LinearLayout>
 <!-- Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:layout_margin="20dip" android:text="Start Service" android:id="@+id/menu_button_services" android:enabled="false"></Button-->
-<TextView android:layout_width="wrap_content" android:layout_margin="5dp" android:layout_height="wrap_content" android:text="From your PC register for the EPIC-service. Afterwards you can connect to the server by scanning the QrCode displayed on the web page. If you prefer, you can also manually enter your username and password." android:layout_marginTop="10dp"></TextView>
-<Button android:text="Scann QrCode of web page" android:layout_height="wrap_content" android:id="@+id/button_qrcode" android:layout_width="fill_parent" android:layout_margin="5dp" android:layout_gravity="center_horizontal"></Button>
-<EditText android:layout_width="fill_parent" android:id="@+id/edittextusername" android:layout_height="wrap_content" android:hint="username" android:layout_margin="5dp"></EditText>
-<EditText android:layout_width="fill_parent" android:id="@+id/edittextpassword" android:layout_height="wrap_content" android:hint="password" android:layout_margin="5dp"></EditText>
+<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_margin="10dp" android:text="From your PC register for the EPIC-service. Afterwards, connect to the server by scanning the QrCode displayed at the webpage. If you prefer, you can manually enter your username and password." android:textColor="#333333"></TextView>
+<Button android:layout_height="wrap_content" android:id="@+id/button_qrcode" android:layout_width="fill_parent" android:layout_gravity="center_horizontal" android:text="Scann QrCode of webpage" android:layout_margin="10dp"></Button>
+<EditText android:layout_width="fill_parent" android:id="@+id/edittextusername" android:layout_height="wrap_content" android:hint="username" android:layout_marginLeft="10dp" android:layout_marginRight="10dp" android:layout_marginTop="10dp"></EditText>
+<EditText android:layout_width="fill_parent" android:id="@+id/edittextpassword" android:layout_height="wrap_content" android:hint="password" android:layout_marginLeft="10dp" android:layout_marginRight="10dp" android:layout_marginBottom="10dp"></EditText>
 <LinearLayout android:id="@+id/linearLayout1" android:layout_width="fill_parent" android:layout_height="wrap_content">
-    <Button android:text="Cancel" android:id="@+id/buttoncancel" android:layout_height="fill_parent" android:layout_width="fill_parent" android:layout_weight="1"></Button>
-    <Button android:layout_width="fill_parent" android:text="Save" android:layout_height="wrap_content" android:id="@+id/buttonsave" android:layout_weight="1"></Button>
+    <Button android:text="Done" android:layout_height="wrap_content" android:id="@+id/buttondone" android:layout_width="wrap_content" android:minWidth="100dp" android:maxWidth="200dp" android:layout_gravity="center_horizontal" android:layout_weight="1" android:layout_margin="10dp"></Button>
 </LinearLayout>
 
+
+
+
+
 </LinearLayout>
+</FrameLayout>

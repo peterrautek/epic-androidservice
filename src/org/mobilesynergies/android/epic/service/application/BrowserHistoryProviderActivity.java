@@ -2,7 +2,10 @@ package org.mobilesynergies.android.epic.service.application;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Timer;
+import java.util.TimerTask;
 
+import org.mobilesynergies.android.epic.service.R;
 import org.mobilesynergies.android.epic.service.core.ApplicationActivity;
 import org.mobilesynergies.android.epic.service.core.states.EpicServiceState;
 import org.mobilesynergies.android.epic.service.interfaces.ParameterMapImpl;
@@ -11,13 +14,16 @@ import org.mobilesynergies.epic.client.remoteui.Parameter;
 import org.mobilesynergies.epic.client.remoteui.ParameterMap;
 import org.mobilesynergies.epic.client.remoteui.StringParameter;
 
+
 import android.app.ListActivity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.RemoteException;
 import android.provider.Browser;
 import android.util.Log;
+import android.view.Window;
 import android.widget.ArrayAdapter;
 
 /**
@@ -47,7 +53,9 @@ public class BrowserHistoryProviderActivity extends ApplicationActivity{
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
+		setContentView(R.layout.browserhistory);
 		Intent callingIntent = getIntent(); 
 		Bundle b = callingIntent.getExtras();
 		if(b!=null){
@@ -230,9 +238,25 @@ public class BrowserHistoryProviderActivity extends ApplicationActivity{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		finish();
-	
+		TimerTask t = new TimerTask(){
+
+			@Override
+			public void run() {
+				handleFinish.sendEmptyMessage(0);
+			}
+			
+		};
+		Timer timer = new Timer();
+		//wait some time before closing the application (allowing the user to see the screen of this app)
+		timer.schedule(t, 2500);
+		
 	}
+	
+	Handler handleFinish = new Handler(){
+		public void handleMessage(android.os.Message msg) {
+			finish();
+		};
+	};
 
 
 	

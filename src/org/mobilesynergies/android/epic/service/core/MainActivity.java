@@ -19,6 +19,7 @@ import android.os.RemoteException;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
@@ -53,6 +54,7 @@ public class MainActivity extends Activity{
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.main);
 	}
 
@@ -103,7 +105,7 @@ public class MainActivity extends Activity{
 
 	private void updateUI() {
 		mState = (TextView) findViewById(R.id.textviewusername);
-		Button blogin = (Button) findViewById(R.id.buttonLogIn);
+		Button blogin = (Button) findViewById(R.id.buttonAction);
 		blogin.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -216,12 +218,10 @@ public class MainActivity extends Activity{
 			// interact with the service.  We are communicating with our
 			// service through an IDL interface, so get a client-side
 			// representation of that from the raw service object.
-			Toast.makeText(MainActivity.this, "The epic service process was started sucessfully!", Toast.LENGTH_LONG).show();
+			//Toast.makeText(MainActivity.this, "The epic service process was started sucessfully!", Toast.LENGTH_LONG).show();
 			mEpicService = (IEpicServiceApplicationInterface) IEpicServiceApplicationInterface.Stub.asInterface(service);
 			mIsBound = true;
 			try {
-
-
 				mEpicService.registerServiceStatusChangeCallback(mServiceStatusChangeCallback);
 				int state = mEpicService.getState();
 				MainActivity.this.mStateChangeHandler.sendEmptyMessage(state);
