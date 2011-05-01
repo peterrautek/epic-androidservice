@@ -20,6 +20,18 @@
 			android:label="@string/app_name">
 		</activity>
 		
+		<activity android:name=".administration.ServiceConfigurationActivity"
+			android:configChanges="keyboard|keyboardHidden|orientation">
+		<intent-filter>
+				<action android:name="org.mobilesynergies.action.ConfigurePermissions"/>
+				<category android:name="android.intent.category.DEFAULT" />
+		</intent-filter>
+			
+			
+			
+			</activity>
+	
+	
 		<activity android:name=".administration.LogActivity" android:label="@string/app_name" android:launchMode="singleTop">
 		<intent-filter>
 				<action android:name="org.mobilesynergies.android.epic.service.log"/>

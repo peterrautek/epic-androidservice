@@ -1,11 +1,14 @@
 package org.mobilesynergies.android.epic.service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import org.mobilesynergies.android.epic.service.Manifest.permission;
+import org.mobilesynergies.android.epic.service.administration.ConfigurationDatabase;
+import org.mobilesynergies.android.epic.service.administration.ServiceConfigurationActivity;
 import org.mobilesynergies.android.epic.service.core.AdministrationInterface;
 import org.mobilesynergies.android.epic.service.core.ApplicationInterface;
 
@@ -30,9 +33,13 @@ import org.mobilesynergies.epic.client.remoteui.ParameterMap;
 
 import android.app.Service;
 import android.content.ActivityNotFoundException;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -130,12 +137,68 @@ public class EpicService extends Service {
 			if((action==null)||(action.trim().length()==0)){
 				return false;
 			}
+			
+			
+			
+			// perform intent resolution
+			PackageManager packageManager = getPackageManager();
+			// create the intent 
+			final Intent mainIntent = new Intent();
+			mainIntent.addCategory(Intent.CATEGORY_DEFAULT);
+			
+			if( ! action.equalsIgnoreCase("org.epic.action.LaunchApplication")){
+				mainIntent.setAction(action);
+				Uri datauri = Uri.parse("epic://"+action);
+				mainIntent.setData(datauri);
+			}
+				
+			if((packageName!=null)&&(packageName.trim().length()>0)){
+				if((className!=null)&&(className.trim().length()>0)){
+					mainIntent.setClassName(packageName, className);
+				} else {
+					mainIntent.setPackage(packageName);
+				}
+			}
+			
+			
+			//try to resolve the intent and get the package and class name
+			ComponentName componentname  = mainIntent.resolveActivity(packageManager);
+			
+			if(componentname==null){
+				//ignore this intent
+				return true;
+			}
+			
+			packageName = componentname.getPackageName();
+			className = componentname.getClassName();
+			
+			// check for permission configuration
+			int iPermission = ConfigurationDatabase.PERMISSION_UNKNOWN;
+			ConfigurationDatabase permissionDatabase = new ConfigurationDatabase(EpicService.this);
+			iPermission = permissionDatabase.getPermissionValue(ConfigurationDatabase.getUniqueId(packageName, className));
+			
 
+			// execute permission model
+			if(iPermission==ConfigurationDatabase.PERMISSION_UNKNOWN){
+				iPermission=ServiceConfigurationActivity.PERMISSION_DEFAULT;
+			}
+			
+			if(iPermission==ConfigurationDatabase.PERMISSION_DISALLOW){
+				return true;
+			}
+			
+			if(iPermission==ConfigurationDatabase.PERMISSION_ASK){
+				//TODO
+				return true;
+			}
+			
+			// start activity
+			
+				
 			mMapSessionIdToPeer.put(sessionid, from);
-
 			Bundle b = new Bundle();
-						
 			if(data!=null){
+				//TODO put data in the bundle
 				//Parcel p = Parcel.obtain();
 				//Map map = data.getMap();
 				//if(map!=null){
@@ -156,22 +219,14 @@ public class EpicService extends Service {
 			b.putString("session", sessionid);
 			b.putString("class", className);
 			b.putString("package", packageName);
-
-			Intent intent = new Intent();
-			intent.putExtras(b);
+			
+			mainIntent.putExtras(b);
 
 			//since the service does not run in a task, we have to start a new task
-			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-			Uri datauri = Uri.parse("epic://"+action);
-			intent.setData(datauri);
-			if(action.equalsIgnoreCase("org.epic.action.LaunchApplication")){
-				intent.setClassName(packageName, className);
-			} else {
-				intent.setAction(action);
-			}
-
+			mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			
 			try{
-				startActivity(intent);
+				startActivity(mainIntent);
 			} catch(ActivityNotFoundException e) {
 				//we cannot resolve it 
 				//we cannot automatically install it 

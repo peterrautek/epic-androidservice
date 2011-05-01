@@ -3,6 +3,7 @@ package org.mobilesynergies.android.epic.service.core;
 import java.util.Date;
 
 import org.mobilesynergies.android.epic.service.EpicService;
+import org.mobilesynergies.android.epic.service.administration.ConfigurationDatabase;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -185,7 +186,23 @@ public final class Preferences {
 		editor.commit();		
 	}
 
+	
+/*
+	public static void setDefaultPackagePermission(Context context, int permission){
+		SharedPreferences settings = getServiceSettings(context);
+		SharedPreferences.Editor editor = settings.edit();
+		editor.putInt("defaultpermission", permission);
+		editor.commit();
+	}
+	
 
+	public static int getDefaultPackagePermission(Context context) {
+		SharedPreferences settings = getServiceSettings(context);
+		int permission = settings.getInt("defaultpermission", ConfigurationDatabase.PERMISSION_ALLOW);
+		return permission;
+	}
+
+*/
 	
 
 	

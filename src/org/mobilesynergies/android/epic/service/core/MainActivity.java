@@ -1,8 +1,8 @@
 package org.mobilesynergies.android.epic.service.core;
 
 import org.mobilesynergies.android.epic.service.R;
-import org.mobilesynergies.android.epic.service.administration.ExploreEpicNetwork;
 import org.mobilesynergies.android.epic.service.administration.LogActivity;
+import org.mobilesynergies.android.epic.service.administration.ServiceConfigurationActivity;
 import org.mobilesynergies.android.epic.service.core.states.EpicServiceState;
 import org.mobilesynergies.android.epic.service.interfaces.IEpicServiceApplicationInterface;
 import org.mobilesynergies.android.epic.service.interfaces.IServiceStatusChangeCallback;
@@ -33,7 +33,7 @@ import android.widget.Toast;
 public class MainActivity extends Activity{
 
 
-	private static final int MENUID_EXPLORENETWORK = 1;
+	private static final int MENUID_CONFIGURE = 1;
 	private static final int MENUID_LOG = 2;
 
 	protected static final int MESSAGEID_PROCESSCRASHED = -333;
@@ -76,7 +76,7 @@ public class MainActivity extends Activity{
 
 	public boolean onCreateOptionsMenu(Menu menu){
 
-		menu.add(0,MENUID_EXPLORENETWORK,0,"Explore Network");
+		menu.add(0,MENUID_CONFIGURE,0,"Configure Application Permissions");
 		menu.add(0,MENUID_LOG,0,"Log messages");
 
 		return true;
@@ -87,9 +87,9 @@ public class MainActivity extends Activity{
 	public boolean onOptionsItemSelected (MenuItem item){
 		int id = item.getItemId();
 		switch(id){
-		case MENUID_EXPLORENETWORK:
-			Intent exploreintent = new Intent(ExploreEpicNetwork.INTENTACTION);
-			startActivity(exploreintent);
+		case MENUID_CONFIGURE:
+			Intent configureintent = new Intent(ServiceConfigurationActivity.INTENTACTION);
+			startActivity(configureintent);
 			break;
 
 		case MENUID_LOG:
