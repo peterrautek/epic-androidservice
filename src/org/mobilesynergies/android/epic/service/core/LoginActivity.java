@@ -247,7 +247,7 @@ public class LoginActivity extends Activity{
 				Toast.makeText(this, result, Toast.LENGTH_LONG).show();
 
 				String[] userandpasswordandservice = result.split("@");
-				if((userandpasswordandservice!=null)&&(userandpasswordandservice.length!=2)){
+				if((userandpasswordandservice!=null)&&(userandpasswordandservice.length<2)){
 					
 					Toast.makeText(this, "Scanning the QrCode didn't work. Please try entering the username and password manually. Cause: Invalid id (no @ symbol found)", Toast.LENGTH_LONG).show();
 				} else {

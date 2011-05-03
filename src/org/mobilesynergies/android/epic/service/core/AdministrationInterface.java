@@ -5,10 +5,8 @@ import org.mobilesynergies.android.epic.service.EpicService;
 import org.mobilesynergies.android.epic.service.interfaces.IEpicServiceAdministrationInterface;
 import org.mobilesynergies.android.epic.service.interfaces.IPresenceStatusChangeCallback;
 import org.mobilesynergies.android.epic.service.interfaces.NetworkNodeImpl;
-import org.mobilesynergies.android.epic.service.interfaces.ParameterMapImpl;
 import org.mobilesynergies.android.epic.service.interfaces.EpicCommandInfoImpl;
 
-import org.mobilesynergies.epic.client.EpicClient;
 import org.mobilesynergies.epic.client.EpicClientException;
 
 
@@ -16,6 +14,7 @@ import org.mobilesynergies.epic.client.NetworkNode;
 import org.mobilesynergies.android.epic.service.interfaces.IServiceStatusChangeCallback;
 import org.mobilesynergies.epic.client.PresenceCallback;
 
+import android.os.Bundle;
 import android.os.RemoteException;
 
 /**
@@ -80,7 +79,7 @@ public class AdministrationInterface extends IEpicServiceAdministrationInterface
 
 
 	@Override
-	public String executeRemoteCommand(String epicNode, String command, String sessionId, ParameterMapImpl parametersIn, ParameterMapImpl parametersOut) throws RemoteException {
+	public String executeRemoteCommand(String epicNode, String command, String sessionId, Bundle parametersIn, Bundle parametersOut) throws RemoteException {
 		String id = sessionId;
 		if(mEpicServiceContext==null) {
 			return null;

@@ -1,7 +1,5 @@
 package org.mobilesynergies.android.epic.service.interfaces;
 
-import org.mobilesynergies.android.epic.service.interfaces.ParameterMapImpl;
-
 	interface IIncomingMessageCallback {
 	
 		/**
@@ -9,6 +7,6 @@ import org.mobilesynergies.android.epic.service.interfaces.ParameterMapImpl;
 		*
 		* @return Return true if the message shall be considered as read. 
 		*/
-		boolean handleMessage(in ParameterMapImpl message);
+		boolean handleMessage(in Bundle data);
 				    
 	}

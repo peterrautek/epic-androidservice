@@ -16,10 +16,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 
+import android.os.Binder;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -44,7 +46,8 @@ public class MainActivity extends Activity{
 	protected static final int MESSAGEID_PROCESSCRASHED = -333;
 	protected static final int MESSAGEID_SERVICENOTRUNNING = -444;
 
-	private static final int REQUESTCODE_LOGINACTIVITY = 123;   
+	private static final int REQUESTCODE_LOGINACTIVITY = 123;
+	private static final String CLASS_TAG = "MainActivity";   
 
 	private static String EULA = "EULA - End-User Software License Agreement for the 'EPIC Service'-Android application.\n PLEASE CAREFULLY READ THE FOLLOWING LEGAL AGREEMENT (\"AGREEMENT\") FOR THE LICENSE OF THE EPIC SERVICE ANDROID APPLICATION (\"SOFTWARE\"). BY USING THE SOFTWARE, YOU (EITHER AN INDIVIDUAL OR A SINGLE ENTITY) CONSENT TO BE BOUND BY AND BECOME A PARTY TO THIS AGREEMENT. IF YOU DO NOT AGREE TO ALL OF THE TERMS OF THIS AGREEMENT, YOU MUST NOT USE THE SOFTWARE.\n\n1.License Grant.\nThe EPIC SERVICE APPLICATION, belonging to Peter Rautek, grants to you a non-exclusive, non-transferable License to use the Software for beta testing purposes (personal or business) provided you do not remove any of the original proprietary, trademark or copyright markings or notices placed upon or contained with the Software.\n\n2. Term.\nThis Agreement is effective for an interim period whilst the software remains in a beta state. \n\n3. Fees.\nThere is no License fee for the Software whilst being used on a non-profit basis by individuals, non-profit organizations or businesses for beta testing purposes.\n\n4. Warranty Disclaimer.\nTHE SOFTWARE IS PROVIDED ON AN \"AS IS\" BASIS. TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, PETER RAUTEK DISCLAIMS ALL WARRANTIES, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE AND NONINFRINGEMENT. YOU ASSUME RESPONSIBILITY FOR SELECTING THE SOFTWARE TO ACHIEVE YOUR INTENDED RESULTS, AND FOR THE USE OF, AND RESULTS OBTAINED FROM THE SOFTWARE. PETER RAUTEK MAKES NO WARRANTY THAT THE SOFTWARE WILL BE FREE FROM DEFECTS OR THAT THE SOFTWARE WILL MEET YOUR REQUIREMENTS. SOME JURISDICTIONS DO NOT ALLOW LIMITATIONS ON IMPLIED WARRANTIES, SO THE ABOVE LIMITATION MAY NOT APPLY TO YOU.\n\n5. Limitation of Liability.\nTO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, UNDER NO CIRCUMSTANCES AND UNDER NO LEGAL THEORY, WHETHER IN TORT, CONTRACT, OR OTHERWISE, SHALL PETER RAUTEK OR ITS SUPPLIERS OR RESELLERS BE LIABLE TO YOU OR TO ANY OTHER PERSON FOR ANY INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES OF ANY CHARACTER ARISING OUT OF THE USE OF OR INABILITY TO USE THE SOFTWARE, INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF GOODWILL, COMPUTER FAILURE OR MALFUNCTION, WORK STOPPAGE OR FOR ANY AND ALL OTHER DAMAGES OR LOSSES. IN NO EVENT WILL PETER RAUTEK BE LIABLE FOR ANY DAMAGES IN EXCESS OF THE LIST PRICE PETER RAUTEK CHARGES FOR A LICENSE TO THE SOFTWARE, EVEN IF PETER RAUTEK SHALL HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. SOME JURISDICTIONS DO NOT ALLOW THE EXCLUSION OR LIMITATION OF INCIDENTAL OR CONSEQUENTIAL DAMAGES, SO THIS LIMITATION AND EXCLUSION MAY NOT APPLY TO YOU.\n\n6. Further Limitation of Liability.\nTHE SOFTWARE IS NOT DESIGNED FOR USE IN HAZARDOUS ENVIRONMENTS REQUIRING FAIL-SAFE PERFORMANCE. PETER RAUTEK EXPRESSLY DISCLAIMS ANY EXPRESS OR IMPLIED WARRANTY OF FITNESS FOR HIGH-RISK ACTIVITIES. YOU AGREE THAT PETER RAUTEK WILL NOT BE LIABLE FOR ANY CLAIMS OR DAMAGES ARISING FROM THE USE OF THE SOFTWARE IN SUCH APPLICATIONS.\n\n7. Miscellaneous.\nThis Agreement is governed by the law of the Austrian Republic and the parties agree that the sole location and venue for any litigation which may arise hereunder shall be Austria. This Agreement sets forth all rights for the user of the Software and is the entire agreement between the parties. This Agreement may not be modified except by a written addendum issued by a duly authorized representative of Peter Rautek. No provision hereof shall be deemed waived unless such waiver shall be in writing and signed by Peter Rautek or a duly authorized representative of Peter Rautek. If any provision of this Agreement is held illegal or unenforceable by a court having jurisdiction, such provision shall be modified to the extent necessary to render it enforceable without losing its intent, or severed from this Agreement if no such modification is possible, and the remainder of this Agreement shall continue in full force and effect. The parties confirm that it is their wish that this Agreement has been written in the English language only.";
 
@@ -136,7 +139,7 @@ public class MainActivity extends Activity{
 	public boolean onCreateOptionsMenu(Menu menu){
 
 		menu.add(0,MENUID_CONFIGURE,0,"Configure Application Permissions");
-		menu.add(0,MENUID_LOG,0,"Log messages");
+		//menu.add(0,MENUID_LOG,0,"Log messages");
 
 		return true;
 
@@ -161,7 +164,18 @@ public class MainActivity extends Activity{
 
 
 	private void updateUi(int state) {
+		Log.d(CLASS_TAG, "got informed of state: " + EpicServiceState.getStateAsHumanReadableString(mCurrentState));
 		mCurrentState=state;
+		if(mEpicService!=null){
+			try {
+				mCurrentState = mEpicService.getState();
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		Log.d(CLASS_TAG, "switched to state: " + EpicServiceState.getStateAsHumanReadableString(mCurrentState));
 
 		TextView tvState = (TextView) findViewById(R.id.textviewState);
 		tvState.setText(getInternalStateMessage(mCurrentState));
@@ -306,12 +320,14 @@ public class MainActivity extends Activity{
 
 
 	private void startEpicService() {
+		Log.d(CLASS_TAG, "start service..." );
 		//String strServiceName = IEpicServiceApplicationInterface.class.getName();
 		Intent intent = new Intent("org.mobilesynergies.EPIC_SERVICE");
 		if(bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE)){
-
+			Log.d(CLASS_TAG, "bind service!!!" );
 		} else {
 			mStateChangeHandler.sendEmptyMessage(MESSAGEID_SERVICENOTRUNNING);
+			Log.d(CLASS_TAG, "bind service failed!!!" );
 		}
 
 	}
@@ -344,12 +360,15 @@ public class MainActivity extends Activity{
 			// service through an IDL interface, so get a client-side
 			// representation of that from the raw service object.
 			//Toast.makeText(MainActivity.this, "The epic service process was started sucessfully!", Toast.LENGTH_LONG).show();
+			Log.d(CLASS_TAG, "service connected!!!" );
 			mEpicService = (IEpicServiceApplicationInterface) IEpicServiceApplicationInterface.Stub.asInterface(service);
 			mIsBound = true;
 			try {
+				Log.d("MainActivity", "registering status change callback " + mServiceStatusChangeCallback);
 				mEpicService.registerServiceStatusChangeCallback(mServiceStatusChangeCallback);
 				int state = mEpicService.getState();
 				MainActivity.this.mStateChangeHandler.sendEmptyMessage(state);
+				
 			} catch (RemoteException e) {
 				MainActivity.this.mStateChangeHandler.sendEmptyMessage(MESSAGEID_SERVICENOTRUNNING);
 				e.printStackTrace();
@@ -363,6 +382,7 @@ public class MainActivity extends Activity{
 		public void onServiceDisconnected(ComponentName className) {
 			// This is called when the connection with the service has been
 			// unexpectedly disconnected -- that is, its process crashed.
+			Log.d(CLASS_TAG, "service disconnected!!!" );
 			mEpicService = null;
 			mIsBound=false;
 			//onDisconnected();
@@ -376,19 +396,20 @@ public class MainActivity extends Activity{
 
 
 
+	private MyServiceStatusChangeCallback mServiceStatusChangeCallback = new MyServiceStatusChangeCallback();
 
-	private IServiceStatusChangeCallback mServiceStatusChangeCallback = new IServiceStatusChangeCallback(){
+	private class MyServiceStatusChangeCallback extends IServiceStatusChangeCallback.Stub{
 
 		@Override
 		public void onServiceStatusChanged(int state)	throws RemoteException {
+			Log.d(CLASS_TAG, "got informed of state change" );
+			//this stuff doesn't work currently for a service that runs in its own process
 			MainActivity.this.mStateChangeHandler.sendEmptyMessage(state);
+			
 		}
+		
 
-		@Override
-		public IBinder asBinder() {
-			return null;
-		}
-
+		
 	};
 
 
@@ -422,7 +443,7 @@ public class MainActivity extends Activity{
 		if(internalState == MESSAGEID_PROCESSCRASHED){
 			statemessage = statemessage + "the epic service process crashed unexpectedly";
 		} else if (internalState == MESSAGEID_SERVICENOTRUNNING){
-			statemessage = statemessage + "failed to start the epic service process";
+			statemessage = statemessage + "the epic service process is not running";
 		} else {
 			statemessage = statemessage + EpicServiceState.getStateAsHumanReadableString(internalState);
 		}

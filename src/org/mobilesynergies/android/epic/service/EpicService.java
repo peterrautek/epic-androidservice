@@ -1,6 +1,10 @@
 package org.mobilesynergies.android.epic.service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 import org.mobilesynergies.android.epic.service.Manifest.permission;
 import org.mobilesynergies.android.epic.service.administration.ConfigurationDatabase;
@@ -15,15 +19,23 @@ import org.mobilesynergies.android.epic.service.interfaces.IEpicServiceAdministr
 import org.mobilesynergies.android.epic.service.interfaces.IEpicServiceApplicationInterface;
 import org.mobilesynergies.android.epic.service.interfaces.IServiceStatusChangeCallback;
 import org.mobilesynergies.android.epic.service.interfaces.IncomingMessageCallbackImpl;
-import org.mobilesynergies.android.epic.service.interfaces.ParameterMapImpl;
+
+import org.mobilesynergies.android.epic.service.remoteui.BundleAdapter;
 import org.mobilesynergies.epic.client.EpicClient;
 import org.mobilesynergies.epic.client.EpicClientException;
 import org.mobilesynergies.epic.client.EpicNetworkConnectivityCallback;
 import org.mobilesynergies.epic.client.IncomingMessageCallback;
 import org.mobilesynergies.epic.client.NetworkNode;
 import org.mobilesynergies.epic.client.PresenceCallback;
+import org.mobilesynergies.epic.client.remoteui.ArrayParameter;
+import org.mobilesynergies.epic.client.remoteui.BooleanParameter;
 import org.mobilesynergies.epic.client.remoteui.EpicCommandInfo;
+import org.mobilesynergies.epic.client.remoteui.FloatParameter;
+import org.mobilesynergies.epic.client.remoteui.IntParameter;
 import org.mobilesynergies.epic.client.remoteui.Parameter;
+import org.mobilesynergies.epic.client.remoteui.ParameterManager;
+import org.mobilesynergies.epic.client.remoteui.ParameterMap;
+import org.mobilesynergies.epic.client.remoteui.StringParameter;
 
 import android.app.Service;
 import android.content.ActivityNotFoundException;
@@ -87,7 +99,7 @@ public class EpicService extends Service {
 	protected static final int STATECHANGE_STOP = -5;
 	
 
-
+	
 
 	/**
 	 * A XmppClient handling the interaction with the XmppServer.
@@ -100,6 +112,7 @@ public class EpicService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		Log.d("MainActivity", "service onDestroy()" );
 		Preferences.log(this, CLASS_TAG, "service created");
 		//first check if the user is already registered
 		if(Preferences.isRegistered(this)){
@@ -124,7 +137,7 @@ public class EpicService extends Service {
 	IncomingMessageCallback mEpicMessageListener = new IncomingMessageCallback() {
 
 		@Override
-		public boolean handleMessage(String from, String action, String sessionid, String packageName, String className, Parameter data) {
+		public boolean handleMessage(String from, String action, String sessionid, String packageName, String className, ParameterMap data) {
 
 			if((action==null)||(action.trim().length()==0)){
 				return false;
@@ -138,18 +151,21 @@ public class EpicService extends Service {
 			final Intent mainIntent = new Intent();
 			mainIntent.addCategory(Intent.CATEGORY_DEFAULT);
 			
-			if( ! action.equalsIgnoreCase("org.epic.action.LaunchApplication")){
-				mainIntent.setAction(action);
-				Uri datauri = Uri.parse("epic://"+action);
-				mainIntent.setData(datauri);
-			}
-				
-			if((packageName!=null)&&(packageName.trim().length()>0)){
-				if((className!=null)&&(className.trim().length()>0)){
-					mainIntent.setClassName(packageName, className);
-				} else {
-					mainIntent.setPackage(packageName);
+			if( action.equalsIgnoreCase("org.epic.action.LaunchApplication")){
+				//the application is not a specific epic application
+				if((packageName!=null)&&(packageName.trim().length()>0)){
+					if((className!=null)&&(className.trim().length()>0)){
+						mainIntent.setClassName(packageName, className);
+					} else {
+						mainIntent.setPackage(packageName);
+					}
 				}
+			} else {
+				//the application is a specific epic application
+				mainIntent.setAction(action);
+				Uri datauri = Uri.parse("epic://"+action+"/"+sessionid);
+				mainIntent.setData(datauri);
+				
 			}
 			
 			
@@ -188,37 +204,18 @@ public class EpicService extends Service {
 			
 				
 			mMapSessionIdToPeer.put(sessionid, from);
-			Bundle b = new Bundle();
+			
 			if(data!=null){
-				String type = data.getType();
 				String xml = data.asXml("data");
 				Log.d(CLASS_TAG, xml);
-				ParameterMapImpl map = new ParameterMapImpl();
-				map.putParameter("data", data);
-				//b.putParcelable("data", map);
-				//TODO put data in the bundle
-				//Parcel p = Parcel.obtain();
-				//Map map = data.getMap();
-				//if(map!=null){
-					//p.writeMap(map);
-				//}
-			//	Parcelable p1 = new Parcelable();
-		//		b.putParcel("data", p);
+				Bundle dataBundle = BundleAdapter.makeBundle(data);
+				mainIntent.putExtras(dataBundle);
 				
-				/*Set<String> keys = message.keySet();
-				Iterator<String> iterKeys = keys.iterator();
-				while(iterKeys.hasNext()){
-					String key = iterKeys.next();
-					b.putString(key, message.getString(key));
-				}*/
-
 			}
-			b.putString("action", action);
-			b.putString("session", sessionid);
-			b.putString("class", className);
-			b.putString("package", packageName);
 			
-			mainIntent.putExtras(b);
+			
+			
+			
 
 			//since the service does not run in a task, we have to start a new task
 			mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -246,6 +243,7 @@ public class EpicService extends Service {
 	 */
 	@Override
 	public void onStart(Intent intent, int startId) {
+		Log.d("MainActivity", "service onStart()" );
 		Preferences.log(this, CLASS_TAG, "service started");
 		//first check if the user is already registered
 		if(Preferences.isRegistered(this)){
@@ -267,6 +265,7 @@ public class EpicService extends Service {
 	
 	@Override
 	public void onDestroy() {
+		Log.d("MainActivity", "service onDestroy()" );
 		Preferences.log(this, CLASS_TAG, "service destroyed");
 		/*if(mEpicClient!=null){
 			mEpicClient.disconnect();
@@ -299,6 +298,7 @@ public class EpicService extends Service {
 					}
 					mEpicClient = null;
 					stopSelf();
+					Log.d("MainActivity", "service stopSelf!!!" );
 					break;
 				}
 				case STATECHANGE_XMPPERROR:{
@@ -359,6 +359,9 @@ public class EpicService extends Service {
 			String logmessage = EpicServiceState.getStateAsHumanReadableString(state);
 
 			mWidget.update(EpicService.this, logmessage);
+			//send the new state to state listeners
+			mServiceStateChangeManager.sendStateChangeToListeners(state);
+
 
 			if(state==oldState){
 				//nothing to do!
@@ -373,9 +376,7 @@ public class EpicService extends Service {
 			Preferences.log(EpicService.this, CLASS_TAG, logmessage);
 
 
-			//send the new state to state listeners
-			mServiceStateChangeManager.sendStateChangeToListeners(state);
-
+			
 
 			//handle the new state
 			switch(state){
@@ -485,6 +486,7 @@ public class EpicService extends Service {
 	 * @param callback The callback that will be notified about changes
 	 */
 	public void registerServiceStatusChangeCallback(IServiceStatusChangeCallback callback) {
+		Log.d("MainActivity", "service adding statuscallback: "+callback);
 		mServiceStateChangeManager.addServiceStatusCallback(callback);
 	}
 
@@ -533,7 +535,7 @@ public class EpicService extends Service {
 		//TODO sendMessage(sessionToken, object);
 	}
 
-	public void sendMessage(String action, String sessionid, ParameterMapImpl parameter) {
+	public void sendMessage(String action, String sessionid, Bundle data) {
 
 		int iPermissionSendMessagesStatus = checkCallingOrSelfPermission(permission.sendmessages);
 		if(iPermissionSendMessagesStatus==PackageManager.PERMISSION_DENIED){
@@ -544,7 +546,8 @@ public class EpicService extends Service {
 			return;
 		}
 		String receiver = mMapSessionIdToPeer.get(sessionid);
-		mEpicClient.sendMessage(receiver, action, sessionid, parameter);
+		ParameterMap map = BundleAdapter.makeParameterMap(data);
+		mEpicClient.sendMessage(receiver, action, sessionid, map);
 
 	}
 
@@ -569,14 +572,17 @@ public class EpicService extends Service {
 
 
 	public String executeRemoteCommand(String epicNode, String command,
-			String sessionId, ParameterMapImpl parametersIn,
-			ParameterMapImpl parametersOut) throws EpicClientException {
+			String sessionId, Bundle parametersIn,
+			Bundle parametersOut) throws EpicClientException {
 		if(mEpicClient==null){
 			return null;
 		}
 
+		ParameterMap indata = BundleAdapter.makeParameterMap(parametersIn);
+		ParameterMap outdata = BundleAdapter.makeParameterMap(parametersOut);
+		
 		return mEpicClient.executeRemoteCommand(epicNode, command,
-				sessionId, parametersIn, parametersOut);
+				sessionId, indata, outdata);
 	}
 
 
@@ -588,7 +594,10 @@ public class EpicService extends Service {
 	}
 
 	public int getState() {
-		return mState.getState();
+		int state = mState.getState();
+		Log.d("MainActivity", "Service was asked for state: "+EpicServiceState.getStateAsHumanReadableString(state));
+		return state;
+		
 	}
 
 

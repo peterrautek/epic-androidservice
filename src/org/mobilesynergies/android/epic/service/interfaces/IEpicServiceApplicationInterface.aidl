@@ -4,7 +4,6 @@ import org.mobilesynergies.android.epic.service.interfaces.IServiceStatusChangeC
 import org.mobilesynergies.android.epic.service.interfaces.IApplicationStatusChangeCallback;
 import org.mobilesynergies.android.epic.service.interfaces.IIncomingMessageCallback;
 import org.mobilesynergies.android.epic.service.interfaces.IRemoteCommandCallback;
-import org.mobilesynergies.android.epic.service.interfaces.ParameterMapImpl;
 
 interface IEpicServiceApplicationInterface {
 	
@@ -16,7 +15,7 @@ interface IEpicServiceApplicationInterface {
 		
 		void unregisterMessageCallback(in String application);
 		
-		void sendMessage(in String action, in String sessionid, in ParameterMapImpl map);
+		void sendMessage(in String action, in String sessionid, in Bundle data);
 		
 		int getState();
 		

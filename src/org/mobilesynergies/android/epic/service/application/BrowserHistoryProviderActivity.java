@@ -8,16 +8,12 @@ import java.util.TimerTask;
 import org.mobilesynergies.android.epic.service.R;
 import org.mobilesynergies.android.epic.service.core.ApplicationActivity;
 import org.mobilesynergies.android.epic.service.core.states.EpicServiceState;
-import org.mobilesynergies.android.epic.service.interfaces.ParameterMapImpl;
-import org.mobilesynergies.epic.client.remoteui.ArrayParameter;
-import org.mobilesynergies.epic.client.remoteui.Parameter;
-import org.mobilesynergies.epic.client.remoteui.ParameterMap;
-import org.mobilesynergies.epic.client.remoteui.StringParameter;
 
 
 import android.app.ListActivity;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.RemoteException;
@@ -44,7 +40,7 @@ public class BrowserHistoryProviderActivity extends ApplicationActivity{
 	/** The data that is sent with the request
 	 * 
 	 */
-	private ParameterMapImpl mData = null;
+	private Bundle mData = null;
 
 
 	/** 
@@ -56,16 +52,14 @@ public class BrowserHistoryProviderActivity extends ApplicationActivity{
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
 		setContentView(R.layout.browserhistory);
-		Intent callingIntent = getIntent(); 
-		Bundle b = callingIntent.getExtras();
-		if(b!=null){
-			mSessionId  = b.getString("session");
-			mData  =(ParameterMapImpl) b.getParcelable("data");
-		}
+		Intent callingIntent = getIntent();
+		Uri uri = callingIntent.getData();
+		mSessionId = uri.getLastPathSegment();
+		mData = callingIntent.getExtras();
 		
 	}
 
-	private ArrayParameter getHistoryMostVisits(int start, int size) {
+	private Bundle getHistoryMostVisits(int start, int size) {
 		String[] projection = new String[] {
 				Browser.BookmarkColumns.DATE, 
 				Browser.BookmarkColumns.TITLE,
@@ -91,7 +85,8 @@ public class BrowserHistoryProviderActivity extends ApplicationActivity{
 		int titleIdx = mCur.getColumnIndex(Browser.BookmarkColumns.TITLE);
 		int urlIdx = mCur.getColumnIndex(Browser.BookmarkColumns.URL);
 		int visitsIdx = mCur.getColumnIndex(Browser.BookmarkColumns.VISITS);
-		ArrayList<Parameter> array = new ArrayList<Parameter>();
+		String keyString = "entry";
+		Bundle entries = new Bundle();
 		for(int i = 0; i<size; i++) {
 			
 			String date = mCur.getString(dateIdx);
@@ -101,7 +96,7 @@ public class BrowserHistoryProviderActivity extends ApplicationActivity{
 			
 			if((url.length()>0)&&(title.length()>0)){
 			
-				ParameterMap entry = new ParameterMap();
+				Bundle entry = new Bundle();
 				if(url.length()>0){
 					entry.putString("url", url);
 				}
@@ -114,18 +109,18 @@ public class BrowserHistoryProviderActivity extends ApplicationActivity{
 				if(visits.length()>0){
 					entry.putInt("visits", Integer.parseInt(visits));
 				}				
-				array.add(entry);
+				entries.putBundle(keyString+i, entry);
 			}
 			if(!mCur.moveToNext())
 			{
 				i=size;
 			}
 		}
-		ArrayParameter arrayparameter = new ArrayParameter(array);
-		return arrayparameter;
+		
+		return entries;
 	}
 
-	public ArrayParameter getHistoryMostRecent(int start, int length){
+	public Bundle getHistoryMostRecent(int start, int length){
 
 		String[] projection = new String[] {
 				Browser.BookmarkColumns.DATE, 
@@ -151,7 +146,8 @@ public class BrowserHistoryProviderActivity extends ApplicationActivity{
 		int titleIdx = mCur.getColumnIndex(Browser.BookmarkColumns.TITLE);
 		int urlIdx = mCur.getColumnIndex(Browser.BookmarkColumns.URL);
 		int visitsIdx = mCur.getColumnIndex(Browser.BookmarkColumns.VISITS);
-		ArrayList<Parameter> array = new ArrayList<Parameter>();
+		Bundle entries = new Bundle();
+		String keyString = "entry";
 		for(int i = 0; i<length; i++) {
 			
 			String date = mCur.getString(dateIdx);
@@ -159,9 +155,10 @@ public class BrowserHistoryProviderActivity extends ApplicationActivity{
 			String url = mCur.getString(urlIdx);
 			String visits = mCur.getString(visitsIdx);
 			
+			
 			if((url.length()>0)&&(title.length()>0)){
 			
-				ParameterMap entry = new ParameterMap();
+				Bundle entry = new Bundle();
 				if(url.length()>0){
 					entry.putString("url", url);
 				}
@@ -174,15 +171,15 @@ public class BrowserHistoryProviderActivity extends ApplicationActivity{
 				if(visits.length()>0){
 					entry.putInt("visits", Integer.parseInt(visits));
 				}				
-				array.add(entry);
+				entries.putBundle(keyString+i, entry);
 			}
 			if(!mCur.moveToNext())
 			{
 				i=length;
 			}
 		}
-		ArrayParameter arrayparameter = new ArrayParameter(array);
-		return arrayparameter;
+		
+		return entries;
 	}
 
 
@@ -221,19 +218,22 @@ public class BrowserHistoryProviderActivity extends ApplicationActivity{
 		if(mData!=null){
 			start = mData.getInt("start", 0);
 			size = mData.getInt("size", 10);
-			order = mData.getString("order");
+			String o = mData.getString("order"); 
+			if(o!=null){
+				order = o;
+			}
 		}
-		ArrayParameter entries = null;
+		Bundle data = null;
+		
 		if(order.equalsIgnoreCase("visits")){
-			entries = getHistoryMostVisits(start, size);
+			data = getHistoryMostVisits(start, size);
 		} else {
-			entries = getHistoryMostRecent(start, size);
+			data = getHistoryMostRecent(start, size);
 		}
 		
-		ParameterMapImpl map = new ParameterMapImpl();
-		map.putParameter("entries", entries);
+		
 		try {			  
-			mEpicService.sendMessage(EPIC_ACTION, mSessionId, map);
+			mEpicService.sendMessage(EPIC_ACTION, mSessionId, data);
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

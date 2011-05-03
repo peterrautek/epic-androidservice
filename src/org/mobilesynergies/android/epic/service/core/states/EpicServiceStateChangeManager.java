@@ -9,6 +9,7 @@ import org.mobilesynergies.android.epic.service.interfaces.IServiceStatusChangeC
 
 import android.os.Bundle;
 import android.os.RemoteException;
+import android.util.Log;
 
 /**
  *
@@ -24,13 +25,16 @@ public class EpicServiceStateChangeManager {
 	private HashSet<IServiceStatusChangeCallback> mSetServiceStatusCallbacks = new HashSet<IServiceStatusChangeCallback>();
 
 	public void sendStateChangeToListeners(int newState){
-
+		
+		Log.d("MainActivity", "StateChangeManager sends state: '"+EpicServiceState.getStateAsHumanReadableString(newState)+ "' to "+mSetServiceStatusCallbacks.size()+" receivers");
+		
 		Iterator<IServiceStatusChangeCallback> iter = mSetServiceStatusCallbacks.iterator();
 		while(iter.hasNext()){
 			IServiceStatusChangeCallback s = iter.next();
 			if(s==null)
 			{
-				iter.remove();
+				//iter.remove();
+				Log.d("MainActivity", "remove receiver");
 			} else {
 				try {
 					s.onServiceStatusChanged(newState);
@@ -42,6 +46,7 @@ public class EpicServiceStateChangeManager {
 	}
 
 	public void addServiceStatusCallback(IServiceStatusChangeCallback callback) {
+		Log.d("MainActivity", "added state change listener: " + callback);
 		mSetServiceStatusCallbacks.add(callback);		
 	}
 

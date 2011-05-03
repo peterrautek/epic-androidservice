@@ -3,7 +3,6 @@ package org.mobilesynergies.android.epic.service.interfaces;
 import org.mobilesynergies.android.epic.service.interfaces.IPresenceStatusChangeCallback;
 import org.mobilesynergies.android.epic.service.interfaces.IServiceStatusChangeCallback;
 import org.mobilesynergies.android.epic.service.interfaces.NetworkNodeImpl;
-import org.mobilesynergies.android.epic.service.interfaces.ParameterMapImpl;
 import org.mobilesynergies.android.epic.service.interfaces.EpicCommandInfoImpl;
 
 	interface IEpicServiceAdministrationInterface{
@@ -36,7 +35,7 @@ import org.mobilesynergies.android.epic.service.interfaces.EpicCommandInfoImpl;
 		 * @param outParameters The parameters that are needed for completion of the next stage of the command. The caller must provide an empty ParameterMap here to receive the necessary parameters. 
 		 * @return The sessionId of this command. This id is used to later refer to this command.
 		 */          		
-		String executeRemoteCommand(in String epicNode, in String command, in String sessionId, in ParameterMapImpl inParameters, out ParameterMapImpl outParameters);
+		String executeRemoteCommand(in String epicNode, in String command, in String sessionId, in Bundle inParameters, out Bundle outParameters);
 		
 		/**
 		 * Get a list of remote commands for one epic node

@@ -100,7 +100,7 @@
 			
 		</activity>
 		
-		<service android:name=".EpicService" android:exported="true"> <!--android:process=":RemoteIntentServiceProcess"-->
+		<service android:name=".EpicService" android:exported="true" android:process="service.Process">
 			<intent-filter>
 				<action android:name="org.mobilesynergies.android.epic.service.interfaces.IEpicServiceAdministrationInterface" />
 				<action android:name="org.mobilesynergies.EPIC_SERVICE" />

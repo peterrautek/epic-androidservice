@@ -9,11 +9,6 @@ import java.util.TimerTask;
 import org.mobilesynergies.android.epic.service.R;
 import org.mobilesynergies.android.epic.service.core.ApplicationActivity;
 import org.mobilesynergies.android.epic.service.core.states.EpicServiceState;
-import org.mobilesynergies.android.epic.service.interfaces.ParameterMapImpl;
-import org.mobilesynergies.epic.client.remoteui.ArrayParameter;
-import org.mobilesynergies.epic.client.remoteui.Parameter;
-import org.mobilesynergies.epic.client.remoteui.ParameterMap;
-import org.mobilesynergies.epic.client.remoteui.StringParameter;
 
 
 import android.app.ListActivity;
@@ -48,7 +43,7 @@ public class ListEpicActionsActivity extends ApplicationActivity{
 	/** The data that is sent with the request
 	 * 
 	 */
-	private ParameterMapImpl mData = null;
+	private Bundle mData = null;
 
 
 	/** 
@@ -61,14 +56,16 @@ public class ListEpicActionsActivity extends ApplicationActivity{
 		
 		setContentView(R.layout.listactions);
 		Intent callingIntent = getIntent(); 
-		Bundle b = callingIntent.getExtras();
-		if(b!=null){
-			mSessionId  = b.getString("session");
-			mData  =(ParameterMapImpl) b.getParcelable("data");
+		mData = callingIntent.getExtras();
+		
+		Uri uri = callingIntent.getData();
+		if(uri!=null){
+			mSessionId  = uri.getLastPathSegment();
 		}
+		
 	}
 
-	private ArrayParameter getList(int start, int size) {
+	private Bundle getList(int start, int size) {
 		
 		
 		Intent intent = new Intent();
@@ -81,7 +78,7 @@ public class ListEpicActionsActivity extends ApplicationActivity{
 		
 		//check boundary condition
 		if(start>=list.size()){
-			return new ArrayParameter();
+			return new Bundle();
 		}
 		
 		Iterator<ResolveInfo> iter = list.iterator();
@@ -92,7 +89,8 @@ public class ListEpicActionsActivity extends ApplicationActivity{
 			counter++;
 		}
 		
-		ArrayList<Parameter> array = new ArrayList<Parameter>();
+		Bundle entries = new Bundle();
+		String keyString = "entry";
 		// add stuff to the list
 		while((counter<start+size)&&(iter.hasNext())){
 			ResolveInfo info = iter.next();
@@ -103,17 +101,16 @@ public class ListEpicActionsActivity extends ApplicationActivity{
 				action = info.filter.getAction(0);
 			}
 			
-			ParameterMapImpl map = new ParameterMapImpl();
-			map.putString("package", packageName);
-			map.putString("class", className);
+			Bundle data = new Bundle();
+			data.putString("package", packageName);
+			data.putString("class", className);
 			if(action!=null){
-				map.putString("action", action);
+				data.putString("action", action);
 			}
-			array.add(map);
+			entries.putBundle(keyString+counter, data);
 			counter++;
 		}
-		ArrayParameter arrayparameter = new ArrayParameter(array);
-		return arrayparameter;
+		return entries;
 	}
 
 
@@ -154,13 +151,10 @@ public class ListEpicActionsActivity extends ApplicationActivity{
 			start = mData.getInt("start", 0);
 			size = mData.getInt("size", 10);
 		}
-		ArrayParameter entries = null;
-		entries = getList(start, size);
-		
-		ParameterMapImpl map = new ParameterMapImpl();
-		map.putParameter("data", entries);
+		Bundle data = null;
+		data = getList(start, size);
 		try {			  
-			mEpicService.sendMessage(EPIC_ACTION, mSessionId, map);
+			mEpicService.sendMessage(EPIC_ACTION, mSessionId, data);
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

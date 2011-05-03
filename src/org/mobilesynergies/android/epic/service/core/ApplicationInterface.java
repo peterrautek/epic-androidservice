@@ -4,11 +4,11 @@ import org.mobilesynergies.android.epic.service.EpicService;
 
 import org.mobilesynergies.android.epic.service.interfaces.IEpicServiceApplicationInterface;
 import org.mobilesynergies.android.epic.service.interfaces.IncomingMessageCallbackImpl;
-import org.mobilesynergies.android.epic.service.interfaces.ParameterMapImpl;
 
 import org.mobilesynergies.android.epic.service.interfaces.IIncomingMessageCallback;
 import org.mobilesynergies.android.epic.service.interfaces.IServiceStatusChangeCallback;
 
+import android.os.Bundle;
 import android.os.RemoteException;
 
 
@@ -51,12 +51,7 @@ public class ApplicationInterface extends IEpicServiceApplicationInterface.Stub 
 	}
 	
 
-	@Override
-	public void sendMessage(String action, String sessionid, ParameterMapImpl map)
-	throws RemoteException {
-		mEpicServiceContext.sendMessage(action, sessionid, map);
-	}
-
+	
 	
 	@Override
 	public void unregisterMessageCallback(String application) throws RemoteException {
@@ -72,8 +67,17 @@ public class ApplicationInterface extends IEpicServiceApplicationInterface.Stub 
 	public int getState() throws RemoteException {
 		return mEpicServiceContext.getState();
 	}
-	
-	
+
+
+
+	@Override
+	public void sendMessage(String action, String sessionid, Bundle data)
+			throws RemoteException {
+		mEpicServiceContext.sendMessage(action, sessionid, data);
+		
+	}
+
+
 
 
 

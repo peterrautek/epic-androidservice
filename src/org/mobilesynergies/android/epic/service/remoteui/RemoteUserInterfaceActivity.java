@@ -2,8 +2,8 @@ package org.mobilesynergies.android.epic.service.remoteui;
 
 import org.mobilesynergies.android.epic.service.administration.ServiceAdministrationActivity;
 import org.mobilesynergies.android.epic.service.core.states.EpicServiceState;
-import org.mobilesynergies.android.epic.service.interfaces.ParameterMapImpl;
 import org.mobilesynergies.epic.client.remoteui.Parameter;
+import org.mobilesynergies.epic.client.remoteui.ParameterMap;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -32,7 +32,7 @@ public class RemoteUserInterfaceActivity extends ServiceAdministrationActivity {
 	
 	private String mAddress;
 	private String mCommand;
-	private ParameterMapImpl mCurrentParameterMap = null;
+	private Bundle mCurrentDataBundle = null;
 	private String mSessionId = null;
 
 	protected UiGenerator mCurrentUiGenerator;
@@ -76,12 +76,12 @@ public class RemoteUserInterfaceActivity extends ServiceAdministrationActivity {
 		@Override
 		public void handleMessage(Message msg) {
 			super.handleMessage(msg);
-			if(mCurrentParameterMap==null) {
+			if(mCurrentDataBundle==null) {
 				//TODO change the ui to some error or some finished screen
 				return;
 			}
 			
-			View view = mCurrentUiGenerator.initializeUi(RemoteUserInterfaceActivity.this, mCurrentParameterMap);
+			View view = mCurrentUiGenerator.initializeUi(RemoteUserInterfaceActivity.this, BundleAdapter.makeParameterMap(mCurrentDataBundle));
 			view.setId(ID_MAINVIEW);
 						
 			
@@ -97,7 +97,7 @@ public class RemoteUserInterfaceActivity extends ServiceAdministrationActivity {
 
 				@Override
 				public void onClick(View v) {
-					mCurrentParameterMap = null;
+					mCurrentDataBundle = null;
 					mCurrentUiGenerator = null;
 					finish();					
 				}
@@ -111,7 +111,7 @@ public class RemoteUserInterfaceActivity extends ServiceAdministrationActivity {
 			buttonOk.setOnClickListener(new OnClickListener(){
 				@Override
 				public void onClick(View v) {
-					ParameterMapImpl map = null;
+					ParameterMap map = null;					
 					try {
 						map = mCurrentUiGenerator.getValues();
 						executeCommand(map);
@@ -146,14 +146,14 @@ public class RemoteUserInterfaceActivity extends ServiceAdministrationActivity {
 		@Override
 		public void handleMessage(Message msg) {
 			super.handleMessage(msg);
-			if(mCurrentParameterMap==null) {
+			if(mCurrentDataBundle==null) {
 				//TODO change the ui to some error or some finished screen
 				return;
 			}
 			
 			//mCurrentUiGenerator = new UiGenerator();
 			try {
-				mCurrentUiGenerator.updateUi(mCurrentParameterMap);
+				mCurrentUiGenerator.updateUi(BundleAdapter.makeParameterMap(mCurrentDataBundle));
 			} catch (Exception e) {
 				Toast.makeText(RemoteUserInterfaceActivity.this, "An unrecoverable error occured during the execution of this command.", Toast.LENGTH_LONG).show();
 				e.printStackTrace();
@@ -188,7 +188,7 @@ public class RemoteUserInterfaceActivity extends ServiceAdministrationActivity {
 				
 				try {
 					Parameter parameter = mCurrentUiGenerator.getValue(variable);
-					ParameterMapImpl map = new ParameterMapImpl();
+					ParameterMap map = new ParameterMap();
 					map.putParameter(variable, parameter);
 					executeCommand(map);
 				} catch (Exception e) {
@@ -200,7 +200,7 @@ public class RemoteUserInterfaceActivity extends ServiceAdministrationActivity {
 
 			@Override
 			public void onSubmitAction() {
-				ParameterMapImpl map = null;
+				ParameterMap map = null;
 				try {
 					map = mCurrentUiGenerator.getValues();
 					executeCommand(map);
@@ -235,7 +235,7 @@ public class RemoteUserInterfaceActivity extends ServiceAdministrationActivity {
 		executeCommand(null);		
 	}
 	
-	private void executeCommand(ParameterMapImpl map){
+	private void executeCommand(ParameterMap map){
 		
 		//handlerDisableUi.sendEmptyMessage(0);
 		//mCurrentParameterMap = null;
@@ -248,8 +248,8 @@ public class RemoteUserInterfaceActivity extends ServiceAdministrationActivity {
 		if(map==null){
 			//initialize the view
 			try {
-				mCurrentParameterMap = new ParameterMapImpl();
-				mSessionId  = mEpicService.executeRemoteCommand(mAddress, mCommand, mSessionId, map, mCurrentParameterMap);
+				mCurrentDataBundle = new Bundle();
+				mSessionId  = mEpicService.executeRemoteCommand(mAddress, mCommand, mSessionId, null, mCurrentDataBundle);
 				handlerInitStage.sendEmptyMessage(0);
 			} catch (RemoteException e) {
 				Toast.makeText(this, "The command could not be initialized", Toast.LENGTH_LONG).show();
@@ -260,8 +260,9 @@ public class RemoteUserInterfaceActivity extends ServiceAdministrationActivity {
 		} else {
 		
 			try {
-				mCurrentParameterMap = new ParameterMapImpl();
-				mSessionId  = mEpicService.executeRemoteCommand(mAddress, mCommand, mSessionId, map, mCurrentParameterMap);
+				mCurrentDataBundle = new Bundle();
+				Bundle data = BundleAdapter.makeBundle(map);
+				mSessionId  = mEpicService.executeRemoteCommand(mAddress, mCommand, mSessionId, data, mCurrentDataBundle);
 				handlerChangeStage.sendEmptyMessage(0);
 			} catch (RemoteException e) {
 				Toast.makeText(this, "The command could not be executed", Toast.LENGTH_LONG).show();

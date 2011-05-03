@@ -5,15 +5,16 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.mobilesynergies.android.epic.service.interfaces.ParameterMapImpl;
 import org.mobilesynergies.epic.client.remoteui.BooleanParameter;
 import org.mobilesynergies.epic.client.remoteui.FloatParameter;
 import org.mobilesynergies.epic.client.remoteui.IntParameter;
 import org.mobilesynergies.epic.client.remoteui.OptionParameter;
 import org.mobilesynergies.epic.client.remoteui.Parameter;
+import org.mobilesynergies.epic.client.remoteui.ParameterMap;
 import org.mobilesynergies.epic.client.remoteui.StringParameter;
 
 import android.content.Context;
+//import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
@@ -44,7 +45,7 @@ public class UiGenerator {
 	private static final int DEFAULT_MIN = 0;
 	private static final int DEFAULT_MAX = 100;
 
-	private ParameterMapImpl mMap = null;
+	private ParameterMap mMap = null;
 	private View mView = null;
 	private HashMap<String, Integer> mKeyIdMap = new HashMap<String, Integer>();
 	private HashMap<String, Integer> mKeyIntegerRangeMap = new HashMap<String, Integer>();
@@ -52,8 +53,7 @@ public class UiGenerator {
 	private SubmitActionListener mSubmitActionListener = null;
 
 	
-	public void updateUi(ParameterMapImpl parameterMap) throws Exception {
-		
+	public void updateUi(ParameterMap parameterMap) throws Exception {
 		//while updating we disable the submitaction listener
 		SubmitActionListener tempListener = mSubmitActionListener;
 		mSubmitActionListener = null;
@@ -179,7 +179,7 @@ public class UiGenerator {
 	 * @param parameterMap The ParameterMap that holds all parameters that need to be displayed to the user.
 	 * @return A LinearLayout that contains a ScrollView with all necessary views. 
 	 */
-	public View initializeUi(Context c, ParameterMapImpl parameterMap) {
+	public View initializeUi(Context c, ParameterMap parameterMap) {
 		
 		mMap = parameterMap;
 		mKeyIdMap.clear();
@@ -439,11 +439,11 @@ public class UiGenerator {
 	 * @return A ParameterMap containing all Parameters, or null if no view was initialized
 	 * @throws Exception If a was initialized but could not be retrieved from the view an exception is thrown.
 	 */
-	public ParameterMapImpl getValues() throws Exception {
+	public ParameterMap getValues() throws Exception {
 		if((mMap==null)||(mView == null))
 			return null;
 
-		ParameterMapImpl resultMap = new ParameterMapImpl();
+		ParameterMap resultMap = new ParameterMap();
 		Set<String> set = mMap.keySet();
 		Iterator<String> iterKeys = set.iterator();
 		
