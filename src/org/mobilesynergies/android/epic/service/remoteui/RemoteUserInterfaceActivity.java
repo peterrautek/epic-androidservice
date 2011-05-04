@@ -2,6 +2,7 @@ package org.mobilesynergies.android.epic.service.remoteui;
 
 import org.mobilesynergies.android.epic.service.administration.ServiceAdministrationActivity;
 import org.mobilesynergies.android.epic.service.core.states.EpicServiceState;
+import org.mobilesynergies.android.epic.service.core.states.StateObject;
 import org.mobilesynergies.epic.client.remoteui.Parameter;
 import org.mobilesynergies.epic.client.remoteui.ParameterMap;
 
@@ -218,14 +219,14 @@ public class RemoteUserInterfaceActivity extends ServiceAdministrationActivity {
 
 	@Override
 	protected void onConnected() {
-		int state = EpicServiceState.UNKNOWN;
+		int state = StateObject.UNKNOWN;
 		try {
 			state = mEpicService.getState();
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		if(EpicServiceState.EPICNETWORKCONNECTION == state){
+		if(StateObject.EPICNETWORKCONNECTION == state){
 			executeCommand(null);
 		}
 	}

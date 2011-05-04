@@ -43,6 +43,12 @@ import org.mobilesynergies.android.epic.service.interfaces.EpicCommandInfoImpl;
 		 */
 		 EpicCommandInfoImpl[] getRemoteCommands(in String epicNode);
 		
+		/**
+		* Stop the service
+		*/
+		
+		void stop();
+	
 		
 				    
 	}

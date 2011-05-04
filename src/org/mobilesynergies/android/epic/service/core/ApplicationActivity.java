@@ -3,6 +3,7 @@ package org.mobilesynergies.android.epic.service.core;
 import org.mobilesynergies.android.epic.service.EpicService;
 import org.mobilesynergies.android.epic.service.core.states.EpicServiceState;
 import org.mobilesynergies.android.epic.service.core.states.EpicServiceStateChangeManager;
+import org.mobilesynergies.android.epic.service.core.states.StateObject;
 
 import org.mobilesynergies.android.epic.service.interfaces.IEpicServiceApplicationInterface;
 import org.mobilesynergies.android.epic.service.interfaces.IServiceStatusChangeCallback;
@@ -128,20 +129,17 @@ public abstract class ApplicationActivity extends Activity {
 		}
 	};
 	
-	private IServiceStatusChangeCallback mServiceStatusChangeCallback = new IServiceStatusChangeCallback(){
-
+	private IServiceStatusChangeCallback.Stub mServiceStatusChangeCallback = new IServiceStatusChangeCallback.Stub() {
+		
+	
 		@Override
 		public void onServiceStatusChanged(int status)
 				throws RemoteException {
-			if(status==EpicServiceState.EPICNETWORKCONNECTION) {
+			if(status==StateObject.EPICNETWORKCONNECTION) {
 				onConnectedToEpicNetwork();
 			} 
 		}
 
-		@Override
-		public IBinder asBinder() {
-			return null;
-		}
 		
 	};
 

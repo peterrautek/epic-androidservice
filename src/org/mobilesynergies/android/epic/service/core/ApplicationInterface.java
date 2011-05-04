@@ -18,51 +18,47 @@ import android.os.RemoteException;
  * Therefore the functions will call handlers in the EpicService thread. 
  */
 public class ApplicationInterface extends IEpicServiceApplicationInterface.Stub {
-	
+
 	private static String CLASS_TAG = ApplicationInterface.class.getSimpleName(); 
-	
+
 	private EpicService mEpicServiceContext = null;
 
 	public ApplicationInterface(EpicService context)
 	{
 		mEpicServiceContext = context;
 	}
-	
-	
-	
+
+
+
 	@Override
 	public int getVersion() throws RemoteException {
 		return EpicService.EPIC_SERVICE_VERSION_NUMBER;
 	}
 
-	
+
 	@Override
-	public void registerServiceStatusChangeCallback(
-			IServiceStatusChangeCallback callback) throws RemoteException {
+	public void registerServiceStatusChangeCallback(IServiceStatusChangeCallback callback) throws RemoteException {
 		mEpicServiceContext.registerServiceStatusChangeCallback(callback);
 	}
 
-	
+	/* not implemented yet
 	@Override
 	public void registerMessageCallback(String application,  
 			IIncomingMessageCallback messageCallback)
 	throws RemoteException {
 		mEpicServiceContext.registerMessageCallback(application,(IncomingMessageCallbackImpl) messageCallback);
 	}
-	
+	*/
 
-	
-	
+
+
+
 	@Override
 	public void unregisterMessageCallback(String application) throws RemoteException {
 		mEpicServiceContext.unregisterMessageCallback(application);
 	}
-	
-	@Override
-	public void stop(){
-		mEpicServiceContext.stop();
-	}
 
+	
 	@Override
 	public int getState() throws RemoteException {
 		return mEpicServiceContext.getState();
@@ -72,9 +68,9 @@ public class ApplicationInterface extends IEpicServiceApplicationInterface.Stub 
 
 	@Override
 	public void sendMessage(String action, String sessionid, Bundle data)
-			throws RemoteException {
+	throws RemoteException {
 		mEpicServiceContext.sendMessage(action, sessionid, data);
-		
+
 	}
 
 

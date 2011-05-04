@@ -71,8 +71,7 @@ public class AdministrationInterface extends IEpicServiceAdministrationInterface
 
 
 	@Override
-	public void registerServiceStatusChangeCallback(
-			IServiceStatusChangeCallback callback) throws RemoteException {
+	public void registerServiceStatusChangeCallback(IServiceStatusChangeCallback callback) throws RemoteException {
 			mEpicServiceContext.registerServiceStatusChangeCallback(callback);
 	}
 
@@ -135,6 +134,11 @@ public class AdministrationInterface extends IEpicServiceAdministrationInterface
 		
 	}
 
+
+	@Override
+	public void stop(){
+		mEpicServiceContext.stop();
+	}
 
 
 	

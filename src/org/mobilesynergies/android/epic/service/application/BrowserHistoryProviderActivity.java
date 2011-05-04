@@ -8,6 +8,7 @@ import java.util.TimerTask;
 import org.mobilesynergies.android.epic.service.R;
 import org.mobilesynergies.android.epic.service.core.ApplicationActivity;
 import org.mobilesynergies.android.epic.service.core.states.EpicServiceState;
+import org.mobilesynergies.android.epic.service.core.states.StateObject;
 
 
 import android.app.ListActivity;
@@ -189,7 +190,7 @@ public class BrowserHistoryProviderActivity extends ApplicationActivity{
 		try {
 			int state = mEpicService.getState();
 			
-			if(state == EpicServiceState.EPICNETWORKCONNECTION){
+			if(state == StateObject.EPICNETWORKCONNECTION){
 				sendMessage();
 			}
 		} catch (RemoteException e) {

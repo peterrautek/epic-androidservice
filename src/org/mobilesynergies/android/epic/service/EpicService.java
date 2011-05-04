@@ -15,6 +15,7 @@ import org.mobilesynergies.android.epic.service.core.Preferences;
 import org.mobilesynergies.android.epic.service.core.ServiceStatusWidget;
 import org.mobilesynergies.android.epic.service.core.states.EpicServiceState;
 import org.mobilesynergies.android.epic.service.core.states.EpicServiceStateChangeManager;
+import org.mobilesynergies.android.epic.service.core.states.StateObject;
 import org.mobilesynergies.android.epic.service.interfaces.IEpicServiceAdministrationInterface;
 import org.mobilesynergies.android.epic.service.interfaces.IEpicServiceApplicationInterface;
 import org.mobilesynergies.android.epic.service.interfaces.IServiceStatusChangeCallback;
@@ -122,8 +123,8 @@ public class EpicService extends Service {
 			//the onstart might be called because the network connectivity changed
 			//it would be very disturbing if the user had to register only because of internet connectivity change
 			//however we inform the widget and the statechangelisteners that the user is not registered yet:
-			int state = mState.updateState(EpicService.this, mEpicClient); 
-			String logmessage = EpicServiceState.getStateAsHumanReadableString(state);
+			int state = EpicServiceState.updateState(mState, EpicService.this, mEpicClient); 
+			String logmessage = StateObject.getStateAsHumanReadableString(state);
 			mWidget.update(EpicService.this, logmessage);
 			mServiceStateChangeManager.sendStateChangeToListeners(state);
 
@@ -253,8 +254,8 @@ public class EpicService extends Service {
 			//the onstart might be called because the network connectivity changed
 			//it would be very disturbing if the user had to register only because of internet connectivity change
 			//however we inform the widget and the statechangelisteners that the user is not registered yet:
-			int state = mState.updateState(EpicService.this, mEpicClient); 
-			String logmessage = EpicServiceState.getStateAsHumanReadableString(state);
+			int state = EpicServiceState.updateState(mState, EpicService.this, mEpicClient); 
+			String logmessage = StateObject.getStateAsHumanReadableString(state);
 			mWidget.update(EpicService.this, logmessage);
 			mServiceStateChangeManager.sendStateChangeToListeners(state);
 
@@ -275,7 +276,7 @@ public class EpicService extends Service {
 
 	}
 
-	EpicServiceState mState = new EpicServiceState();
+	StateObject mState = new StateObject();
 
 	Handler handleStateChanges = new Handler() {
 
@@ -288,9 +289,9 @@ public class EpicService extends Service {
 			} else {
 				switch(msg.what){
 				case STATECHANGE_STOP:{
-					int state = EpicServiceState.STOPPED;
+					int state = StateObject.STOPPED;
 					mState.setState(state);
-					String logmessage = EpicServiceState.getStateAsHumanReadableString(state);
+					String logmessage = StateObject.getStateAsHumanReadableString(state);
 					mWidget.update(EpicService.this, logmessage);
 					mServiceStateChangeManager.sendStateChangeToListeners(state);
 					if(mEpicClient!=null){
@@ -302,9 +303,9 @@ public class EpicService extends Service {
 					break;
 				}
 				case STATECHANGE_XMPPERROR:{
-					int state = EpicServiceState.ERROR_XMPPERROR;
+					int state = StateObject.ERROR_XMPPERROR;
 					mState.setState(state);
-					String logmessage = EpicServiceState.getStateAsHumanReadableString(state);
+					String logmessage = StateObject.getStateAsHumanReadableString(state);
 					mWidget.update(EpicService.this, logmessage);
 					mServiceStateChangeManager.sendStateChangeToListeners(state);
 					if(mEpicClient!=null){
@@ -317,9 +318,9 @@ public class EpicService extends Service {
 				}
 				case STATECHANGE_NONETWORK:{
 					//inform the widget and the state change listeners
-					int state = EpicServiceState.ERROR_NONETWORK;
+					int state = StateObject.ERROR_NONETWORK;
 					mState.setState(state);
-					String logmessage = EpicServiceState.getStateAsHumanReadableString(state);
+					String logmessage = StateObject.getStateAsHumanReadableString(state);
 					mWidget.update(EpicService.this, logmessage);
 					mServiceStateChangeManager.sendStateChangeToListeners(state);
 					//wait for the NetworkConnectivityStatusReceiver to change the state again
@@ -327,9 +328,9 @@ public class EpicService extends Service {
 					break;
 				case STATECHANGE_AUTHFAIL:{
 					//inform the widget and the state change listeners
-					int state = EpicServiceState.ERROR_AUTHFAIL;
+					int state = StateObject.ERROR_AUTHFAIL;
 					mState.setState(state);
-					String logmessage = EpicServiceState.getStateAsHumanReadableString(state);
+					String logmessage = StateObject.getStateAsHumanReadableString(state);
 					mWidget.update(EpicService.this, logmessage);
 					mServiceStateChangeManager.sendStateChangeToListeners(state);
 					//wait for the MainActivity to start the service again
@@ -337,9 +338,9 @@ public class EpicService extends Service {
 					break;
 				case STATECHANGE_NOSERVERCONNECTION:{
 					//inform the widget and the state change listeners
-					int state = EpicServiceState.ERROR_NOSERVER;
+					int state = StateObject.ERROR_NOSERVER;
 					mState.setState(state);
-					String logmessage = EpicServiceState.getStateAsHumanReadableString(state);
+					String logmessage = StateObject.getStateAsHumanReadableString(state);
 					mWidget.update(EpicService.this, logmessage);
 					mServiceStateChangeManager.sendStateChangeToListeners(state);
 					//wait for the MainActivity to start the service again
@@ -354,9 +355,9 @@ public class EpicService extends Service {
 			int oldState = mState.getState();
 
 			//set the new state
-			int state = mState.updateState(EpicService.this, mEpicClient); 
+			int state = EpicServiceState.updateState(mState, EpicService.this, mEpicClient); 
 
-			String logmessage = EpicServiceState.getStateAsHumanReadableString(state);
+			String logmessage = StateObject.getStateAsHumanReadableString(state);
 
 			mWidget.update(EpicService.this, logmessage);
 			//send the new state to state listeners
@@ -380,7 +381,7 @@ public class EpicService extends Service {
 
 			//handle the new state
 			switch(state){
-			case EpicServiceState.INITIALIZING:
+			case StateObject.INITIALIZING:
 				initEpicClient();
 				break;
 			//case EpicServiceState.NONETWORKCONNECTION:
@@ -388,7 +389,7 @@ public class EpicService extends Service {
 				//handleStateChanges.sendEmptyMessage(STATECHANGE_NONETWORK);
 				//the NetworkConnectivityStatusReceiver will trigger a state change
 				//break;
-			case EpicServiceState.NETWORKCONNECTION:
+			case StateObject.NETWORKCONNECTION:
 				//we either just got internet connection or lost server connection
 				//anyway we will schedule (re)connection with the server
 				if( ! mEpicClient.isConnected()) {
@@ -408,7 +409,7 @@ public class EpicService extends Service {
 					}
 				}
 				break;
-			case EpicServiceState.SERVERCONNECTION:
+			case StateObject.SERVERCONNECTION:
 				if( ! mEpicClient.isConnectedToEpicNetwork()) {
 
 					String username = Preferences.getUserName(EpicService.this);
@@ -429,7 +430,7 @@ public class EpicService extends Service {
 					}
 				}
 				break;
-			case EpicServiceState.EPICNETWORKCONNECTION:
+			case StateObject.EPICNETWORKCONNECTION:
 				//got epic network connection - nothing to do!  
 				break;
 			}
@@ -595,7 +596,7 @@ public class EpicService extends Service {
 
 	public int getState() {
 		int state = mState.getState();
-		Log.d("MainActivity", "Service was asked for state: "+EpicServiceState.getStateAsHumanReadableString(state));
+		Log.d("MainActivity", "Service was asked for state: "+StateObject.getStateAsHumanReadableString(state));
 		return state;
 		
 	}

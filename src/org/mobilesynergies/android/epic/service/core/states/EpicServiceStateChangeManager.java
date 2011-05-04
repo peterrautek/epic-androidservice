@@ -26,7 +26,7 @@ public class EpicServiceStateChangeManager {
 
 	public void sendStateChangeToListeners(int newState){
 		
-		Log.d("MainActivity", "StateChangeManager sends state: '"+EpicServiceState.getStateAsHumanReadableString(newState)+ "' to "+mSetServiceStatusCallbacks.size()+" receivers");
+		Log.d("MainActivity", "StateChangeManager sends state: '"+StateObject.getStateAsHumanReadableString(newState)+ "' to "+mSetServiceStatusCallbacks.size()+" receivers");
 		
 		Iterator<IServiceStatusChangeCallback> iter = mSetServiceStatusCallbacks.iterator();
 		while(iter.hasNext()){
