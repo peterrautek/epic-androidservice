@@ -24,17 +24,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 /**
- * Allows the user to enter the username and password either manually or via a QrCode
- * displayed at the epic homepage. 
+ * Allows the user to enter the username and password either manually or via scanning a QrCode. 
+ * The QrCode must encode the user credentials in the form username:password@xmppservice
+ * The Menu options of this activity allow the configuration of the xmpp server, the xmpp service name and the port of the xmpp server.
  *   
  * @author Peter
  */
-
 public class LoginActivity extends Activity{
 
 	protected static final String INTENTACTION = "org.mobilesynergies.android.epic.service.login";
-
-
 
 	/** 
 	 * Called when the activity is first created. 

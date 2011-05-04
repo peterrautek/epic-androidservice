@@ -15,8 +15,10 @@ import android.os.Bundle;
 import android.util.Log;
 
 /** 
- * Converts a Parameter to a bundle.
- * ParameterMaps are converted to Bundles, all other Parameters are directly put into the Bundle
+ * Performs conversions between the ParameterMap and the Bundle class. The ParameterMap is a Android-agnostic class that is part of the EpicClient package.
+ * The Bundle is a Android class that is used to start intents and can also be used for IPC calls. The BundleAdapter provides the often necessary conversion between these two classes. 
+ * ParameterMaps are converted to Bundles, all other Parameters (contained in the ParameterMap) are directly put into the Bundle
+ * Currently only boolean, String, int, float, and ParameterMap Parameters are supported.
  */
 public class BundleAdapter {
 	

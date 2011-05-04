@@ -5,6 +5,11 @@ import org.mobilesynergies.epic.client.remoteui.EpicCommandInfo;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+/**
+ * Provides information about an EpicCommand 
+ * @author Peter
+ *
+ */
 public class EpicCommandInfoImpl extends EpicCommandInfo implements Parcelable, Comparable<String>{
 
 	

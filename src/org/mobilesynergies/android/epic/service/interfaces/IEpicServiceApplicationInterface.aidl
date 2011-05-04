@@ -3,6 +3,9 @@ package org.mobilesynergies.android.epic.service.interfaces;
 import org.mobilesynergies.android.epic.service.interfaces.IServiceStatusChangeCallback;
 import org.mobilesynergies.android.epic.service.interfaces.IIncomingMessageCallback;
 
+/**
+* The administration interface of the EpicService
+*/
 interface IEpicServiceApplicationInterface {
 	
 		/**
@@ -17,14 +20,17 @@ interface IEpicServiceApplicationInterface {
 
 		/**
 		* register a callback to receive messages
-		*
-		* void registerMessageCallback(in String application, in IIncomingMessageCallback messageCallback);
-		* currently not implemented */
+		* currently not implemented 
 		
-		/**
+		* void registerMessageCallback(in String application, in IIncomingMessageCallback messageCallback);
+		* 
+		
+		*
 		* unregister a callback to receive messages
-		*/	
+		* currently not implemented 
+		*	
 		void unregisterMessageCallback(in String application);
+		*/
 		
 		/**
 		* send a message 

@@ -12,11 +12,10 @@ import android.util.Log;
 
 
 /**
- * persistence of package permissions 
+ * The user can set a permission for each installed package. The package permission is stored in this data base.  
  * @author Peter
  *
  */
-
 public class ConfigurationDatabase {
 
 	private static final String CLASS_TAG = ConfigurationDatabase.class.getSimpleName();
@@ -106,9 +105,9 @@ public class ConfigurationDatabase {
 			}
 
 		} finally {
-/*			if(db!=null){
+			if(db!=null){
 				db.close();
-			}*/
+			}
 		}
 		return true;
 	}
@@ -152,9 +151,9 @@ public class ConfigurationDatabase {
 			if(c!=null){
 				c.close();
 			}
-			/*if(db!=null){
+			if(db!=null){
 				db.close();
-			}*/
+			}
 		}
 		return iPermission;
 	}
@@ -186,9 +185,9 @@ public class ConfigurationDatabase {
 			if(c!=null){
 				c.close();
 			}
-			/*if(db!=null){
+			if(db!=null){
 				db.close();
-			}*/
+			}
 		}
 		return bContains;
 	}

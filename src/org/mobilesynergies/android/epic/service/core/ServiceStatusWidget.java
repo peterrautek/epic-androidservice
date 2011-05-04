@@ -2,7 +2,6 @@ package org.mobilesynergies.android.epic.service.core;
 
 import org.mobilesynergies.android.epic.service.EpicService;
 import org.mobilesynergies.android.epic.service.R;
-import org.mobilesynergies.android.epic.service.administration.LogActivity;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -13,6 +12,11 @@ import android.content.Intent;
 import android.util.Log;
 import android.widget.RemoteViews;
 
+/**
+ * A widget displaying the current status of the EpicService.
+ * @author Peter
+ *
+ */
 public class ServiceStatusWidget extends AppWidgetProvider{
 
 	@Override

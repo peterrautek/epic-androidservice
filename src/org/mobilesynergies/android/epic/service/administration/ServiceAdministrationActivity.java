@@ -21,7 +21,7 @@ import android.util.Log;
 
 /**
  * 
- * Abstract class that handles interaction with the epic service. 
+ * Abstract convenience class that handles interaction with the epic service. 
  * Activities that need to perform administrative tasks can extend this Activity. 
  * @author Peter
  */
@@ -129,7 +129,7 @@ public abstract class ServiceAdministrationActivity extends Activity {
 		}
 	};
 	
-	private IServiceStatusChangeCallback mServiceStatusChangeCallback = new IServiceStatusChangeCallback(){
+	private IServiceStatusChangeCallback.Stub mServiceStatusChangeCallback = new IServiceStatusChangeCallback.Stub(){
 
 		@Override
 		public void onServiceStatusChanged(int status)
@@ -139,10 +139,6 @@ public abstract class ServiceAdministrationActivity extends Activity {
 			} 
 		}
 
-		@Override
-		public IBinder asBinder() {
-			return null;
-		}
 		
 	};
 

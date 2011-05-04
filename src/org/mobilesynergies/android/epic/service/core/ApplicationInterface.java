@@ -14,8 +14,7 @@ import android.os.RemoteException;
 
 /**
  * This class implements the application interface. It is the public interface allowing the usage of the EPIC service as a message oriented middleware.    
- * All functions run in the thread of the caller and block it.
- * Therefore the functions will call handlers in the EpicService thread. 
+ *  
  */
 public class ApplicationInterface extends IEpicServiceApplicationInterface.Stub {
 
@@ -48,15 +47,11 @@ public class ApplicationInterface extends IEpicServiceApplicationInterface.Stub 
 	throws RemoteException {
 		mEpicServiceContext.registerMessageCallback(application,(IncomingMessageCallbackImpl) messageCallback);
 	}
-	*/
-
-
-
-
+	
 	@Override
 	public void unregisterMessageCallback(String application) throws RemoteException {
 		mEpicServiceContext.unregisterMessageCallback(application);
-	}
+	}*/
 
 	
 	@Override

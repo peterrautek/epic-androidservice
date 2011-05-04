@@ -1,10 +1,6 @@
 package org.mobilesynergies.android.epic.service;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 
 import org.mobilesynergies.android.epic.service.Manifest.permission;
 import org.mobilesynergies.android.epic.service.administration.ConfigurationDatabase;
@@ -20,7 +16,6 @@ import org.mobilesynergies.android.epic.service.interfaces.IEpicServiceAdministr
 import org.mobilesynergies.android.epic.service.interfaces.IEpicServiceApplicationInterface;
 import org.mobilesynergies.android.epic.service.interfaces.IServiceStatusChangeCallback;
 import org.mobilesynergies.android.epic.service.interfaces.IncomingMessageCallbackImpl;
-
 import org.mobilesynergies.android.epic.service.remoteui.BundleAdapter;
 import org.mobilesynergies.epic.client.EpicClient;
 import org.mobilesynergies.epic.client.EpicClientException;
@@ -28,15 +23,8 @@ import org.mobilesynergies.epic.client.EpicNetworkConnectivityCallback;
 import org.mobilesynergies.epic.client.IncomingMessageCallback;
 import org.mobilesynergies.epic.client.NetworkNode;
 import org.mobilesynergies.epic.client.PresenceCallback;
-import org.mobilesynergies.epic.client.remoteui.ArrayParameter;
-import org.mobilesynergies.epic.client.remoteui.BooleanParameter;
 import org.mobilesynergies.epic.client.remoteui.EpicCommandInfo;
-import org.mobilesynergies.epic.client.remoteui.FloatParameter;
-import org.mobilesynergies.epic.client.remoteui.IntParameter;
-import org.mobilesynergies.epic.client.remoteui.Parameter;
-import org.mobilesynergies.epic.client.remoteui.ParameterManager;
 import org.mobilesynergies.epic.client.remoteui.ParameterMap;
-import org.mobilesynergies.epic.client.remoteui.StringParameter;
 
 import android.app.Service;
 import android.content.ActivityNotFoundException;
@@ -62,16 +50,26 @@ import android.util.Log;
  * @author Peter Rautek
  *
  */
-
-
 public class EpicService extends Service {
 
-
+	/**
+	 * Class identification string
+	 */
 	private static String CLASS_TAG = EpicService.class.getSimpleName();
+	/**
+	 * The widget that shows the state of the EpicService
+	 */
 	private ServiceStatusWidget mWidget = new ServiceStatusWidget();
+	
+	/**
+	 * A map storing unique session ids with their associated peer (i.e., the jid of the sender)
+	 */
 	private HashMap<String, String> mMapSessionIdToPeer = new HashMap<String, String>(); 
 
-	
+
+	/**
+	 * Sends notifications (about state changes of the service) to activities that are bound via the application interface or the administration interface
+	 */
 	EpicServiceStateChangeManager mServiceStateChangeManager = new EpicServiceStateChangeManager();
 
 	
@@ -91,19 +89,40 @@ public class EpicService extends Service {
 	 * Identifying the version number of the epic standard that is implemented with this service
 	 */
 	public static final int EPIC_SERVICE_VERSION_NUMBER = 1;
-	
+
+	/**
+	 * State change constant: the state changed in an expected way
+	 */
 	protected static final int STATECHANGE_OK = 0;
+	/**
+	 * State change constant: the state changed because there is no network connection
+	 */
 	protected static final int STATECHANGE_NONETWORK = -1;
+	/**
+	 * State change constant: the state changed because connection to the server is impossible
+	 */
 	protected static final int STATECHANGE_NOSERVERCONNECTION = -2;
+	/**
+	 * State change constant: the state changed because the authentication failed 
+	 */
 	protected static final int STATECHANGE_AUTHFAIL = -3;
+	/**
+	 * State change constant: the state changed because there was an xmpp stream error
+	 */
 	protected static final int STATECHANGE_XMPPERROR = -4;
+	/**
+	 * State change constant: the state changed because the service was stopped by the user
+	 */
 	protected static final int STATECHANGE_STOP = -5;
 	
-
+	/**
+	 * The state of the EpicService
+	 */
+	StateObject mState = new StateObject();
 	
 
 	/**
-	 * A XmppClient handling the interaction with the XmppServer.
+	 * The EpicClient handling the interaction with the XmppServer
 	 */
 	private EpicClient mEpicClient = null;  
 
@@ -113,7 +132,7 @@ public class EpicService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		Log.d("MainActivity", "service onDestroy()" );
+		//Log.d(CLASS_TAG, "service onDestroy()" );
 		Preferences.log(this, CLASS_TAG, "service created");
 		//first check if the user is already registered
 		if(Preferences.isRegistered(this)){
@@ -132,19 +151,28 @@ public class EpicService extends Service {
 	}
 
 
-
-
-
+	/**
+	 * Callback that is registered with the EpicClient. It is receiving messages.
+	 */
 	IncomingMessageCallback mEpicMessageListener = new IncomingMessageCallback() {
 
+		/**
+		 * Is called when a new message arrived. The sender is requesting the execution of an epic action. 
+		 * Either the epic action is org.epic.action.LaunchApplication and packageName and className are specified, or a different epic action is specified (then the className and the packageName is optional)
+		 *  
+		 * @param from The jid of the sender
+		 * @param action The epic action that shall be performed
+		 * @param sessionid The unique id for this communication session or null if no response is necessary 
+		 * @param packageName The name of the package that implements the epic action or null if no specific implementation of the epic action is required
+		 * @param className The name of the class that implements the epic action or null if no specific implementation of the epic action is required
+		 * @param data The data that shall be sent to the application that is performing the epic action, or null if no data is required
+		 */
 		@Override
 		public boolean handleMessage(String from, String action, String sessionid, String packageName, String className, ParameterMap data) {
 
 			if((action==null)||(action.trim().length()==0)){
 				return false;
 			}
-			
-			
 			
 			// perform intent resolution
 			PackageManager packageManager = getPackageManager();
@@ -202,21 +230,15 @@ public class EpicService extends Service {
 			}
 			
 			// start activity
-			
-				
 			mMapSessionIdToPeer.put(sessionid, from);
 			
 			if(data!=null){
-				String xml = data.asXml("data");
-				Log.d(CLASS_TAG, xml);
+				//String xml = data.asXml("data");
+				//Log.d(CLASS_TAG, xml);
 				Bundle dataBundle = BundleAdapter.makeBundle(data);
 				mainIntent.putExtras(dataBundle);
 				
 			}
-			
-			
-			
-			
 
 			//since the service does not run in a task, we have to start a new task
 			mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -239,12 +261,13 @@ public class EpicService extends Service {
 	};
 
 
-	/** Called when the service is started.
+	/** 
+	 * Called when the service is started.
 	 * The service is either started by an application (respectively the user), or by the NetworkConnectivityStatusReceiver.
 	 */
 	@Override
 	public void onStart(Intent intent, int startId) {
-		Log.d("MainActivity", "service onStart()" );
+		//Log.d(CLASS_TAG, "service onStart()" );
 		Preferences.log(this, CLASS_TAG, "service started");
 		//first check if the user is already registered
 		if(Preferences.isRegistered(this)){
@@ -266,20 +289,19 @@ public class EpicService extends Service {
 	
 	@Override
 	public void onDestroy() {
-		Log.d("MainActivity", "service onDestroy()" );
+		//Log.d(CLASS_TAG, "service onDestroy()" );
 		Preferences.log(this, CLASS_TAG, "service destroyed");
-		/*if(mEpicClient!=null){
-			mEpicClient.disconnect();
-		}*/		
-		
-		
-
 	}
 
-	StateObject mState = new StateObject();
-
+	/**
+	 * The handler that is called for all (asynchronous) events that potentially could change the state.
+	 */
 	Handler handleStateChanges = new Handler() {
 
+		/**
+		 * Handles the state change.
+		 * @param msg A message that must use the correct STATECHANGE constant in the what field (msg.what). All other data of the message is ignored. 
+		 */
 		public void handleMessage(Message msg) {
 			//if other ok messages are pending we delete them
 			this.removeMessages(STATECHANGE_OK);
@@ -299,7 +321,7 @@ public class EpicService extends Service {
 					}
 					mEpicClient = null;
 					stopSelf();
-					Log.d("MainActivity", "service stopSelf!!!" );
+					//Log.d(CLASS_TAG, "service stopSelf!!!" );
 					break;
 				}
 				case STATECHANGE_XMPPERROR:{
@@ -350,6 +372,9 @@ public class EpicService extends Service {
 			}
 		};
 
+		/**
+		 * Is called of the state change is expected (not an error state) 
+		 */
 		private void stateChange() {
 
 			int oldState = mState.getState();
@@ -365,9 +390,7 @@ public class EpicService extends Service {
 
 
 			if(state==oldState){
-				//nothing to do!
 				Preferences.log(EpicService.this, CLASS_TAG, "oldstate == newstate");
-				//return;
 			}
 
 			//the state changed
@@ -376,19 +399,11 @@ public class EpicService extends Service {
 			logmessage = "New State: " + logmessage;
 			Preferences.log(EpicService.this, CLASS_TAG, logmessage);
 
-
-			
-
 			//handle the new state
 			switch(state){
 			case StateObject.INITIALIZING:
 				initEpicClient();
 				break;
-			//case EpicServiceState.NONETWORKCONNECTION:
-				//we lost internet connection
-				//handleStateChanges.sendEmptyMessage(STATECHANGE_NONETWORK);
-				//the NetworkConnectivityStatusReceiver will trigger a state change
-				//break;
 			case StateObject.NETWORKCONNECTION:
 				//we either just got internet connection or lost server connection
 				//anyway we will schedule (re)connection with the server
@@ -437,13 +452,15 @@ public class EpicService extends Service {
 		}
 
 
+		/** 
+		 * Initializes a new EpicClient. Must only be called once!
+		 */
 		private void initEpicClient() {
 			//create a new client
 			mEpicClient = new EpicClient();
 			Preferences.log(EpicService.this, CLASS_TAG, "creating new epic client");
 			//register the connectivity callback
 			mEpicClient.registerEpicNetworkConnectivityCallback(new EpicNetworkConnectivityCallback() {
-				
 
 				@Override
 				public void onConnectionClosed() {
@@ -466,93 +483,84 @@ public class EpicService extends Service {
 
 	/**
 	 * Overriding the android.os.Service function onBind. 
+	 * Activities can either bind to the application interface by launching a intent with action org.mobilesynergies.EPIC_SERVICE,
+	 * or to the administration interface by launching an intent with the action set to the class name of the administration interface.
 	 * 
-	 * @return Returns the desired interface to the calling activity 
+	 * @return Returns the desired interface to the calling activity or null if no appropriate action was specified. 
 	 */
 	@Override
 	public IBinder onBind(Intent intent) {
-		// Select the interface to return.  
+		// Select the interface to return
+		// The application interface
 		if (intent.getAction().equals("org.mobilesynergies.EPIC_SERVICE")) {
 			return (IBinder) mApplicationInterface;
 		}
+		// The administration interface
 		if (IEpicServiceAdministrationInterface.class.getName().equals(intent.getAction())) {
 			return (IBinder) mAdministrationInterface;
 		}
+
+		// Unknown action 
 		return null;
 	}
 
 	/** 
-	 * The application can register a callback to be informed about changes of service availability.
-	 * The callback is called either when the connection to the xmpp server was established and the user authentication suceeded or when the connection to the xmpp server was lost or the user logged out.
+	 * The application can register a callback to be informed about changes of service state.
+	 *
 	 * @param callback The callback that will be notified about changes
 	 */
 	public void registerServiceStatusChangeCallback(IServiceStatusChangeCallback callback) {
-		Log.d("MainActivity", "service adding statuscallback: "+callback);
+		//Log.d(CLASS_TAG, "service adding statuscallback: "+callback);
 		mServiceStateChangeManager.addServiceStatusCallback(callback);
 	}
 
 
 	/**
-	 * @param sessionToken
-	 * @param messageCallback
+	 * Call this function to stop the service. Available only to the administration interface 
 	 */
-	public void registerMessageCallback(String application,
-			IncomingMessageCallbackImpl messageCallback) {
-
-		int iPermissionReceiveMessagesStatus = checkCallingOrSelfPermission(permission.receivemessages);
-		if(iPermissionReceiveMessagesStatus==PackageManager.PERMISSION_DENIED){
-			Log.w(CLASS_TAG, "The calling application is missing the permission" + permission.receivemessages+".");
-			return;
-		}
-
-		//TODO
-	}
-	
 	public void stop(){
 		handleStateChanges.sendEmptyMessage(STATECHANGE_STOP);
 	}
 
+	/**
+	 * Send one (of potentially many) reply message to a caller for a performed epic action.
+	 * The caller is identified by the sessionid only. If the session id is invalid the message will be ignored.
+	 * An activity that wants to send a message needs to specify the appropriate permission in its AndroidManifest file.
+	 *
+	 * @param action The action that was or is being performed
+	 * @param sessionId The session id received from the caller 
+	 * @param data The data that is the result of the action
+	 */
+	public void sendMessage(String action, String sessionId, Bundle data) {
 
-	public void unregisterMessageCallback(String application) {
-		//TODO		
+		int iPermissionSendMessagesStatus = checkCallingOrSelfPermission(permission.sendmessages);
+		if(iPermissionSendMessagesStatus==PackageManager.PERMISSION_DENIED){
+			Log.w(CLASS_TAG, "The calling application is missing the permission"+ permission.sendmessages+".");
+			return;
+		}
+
+		if(mEpicClient==null){
+			return;
+		}
+		
+		if(sessionId==null){
+			return;
+		}
+		
+		String receiver = mMapSessionIdToPeer.get(sessionId);
+		if(receiver==null){
+			return;
+		}
+		ParameterMap map = BundleAdapter.makeParameterMap(data);
+		mEpicClient.sendMessage(receiver, action, sessionId, map);
 	}
-
 
 
 	/**
-
-	 * @param application
-	 * @param object
+	 * Retrieve the network nodes that are currently connected to the network
+	 * @return The known other nodes
+	 * @throws EpicClientException 
 	 */
-	public void sendMessage(String application, Bundle object) {
-		int iPermissionSendMessagesStatus = checkCallingOrSelfPermission(permission.sendmessages);
-		if(iPermissionSendMessagesStatus==PackageManager.PERMISSION_DENIED){
-			Log.w(CLASS_TAG, "The calling application is missing the permission"+ permission.sendmessages+".");
-			return;
-		}
-		if(mEpicClient==null){
-			return;
-		}
-		//TODO sendMessage(sessionToken, object);
-	}
-
-	public void sendMessage(String action, String sessionid, Bundle data) {
-
-		int iPermissionSendMessagesStatus = checkCallingOrSelfPermission(permission.sendmessages);
-		if(iPermissionSendMessagesStatus==PackageManager.PERMISSION_DENIED){
-			Log.w(CLASS_TAG, "The calling application is missing the permission"+ permission.sendmessages+".");
-			return;
-		}
-		if(mEpicClient==null){
-			return;
-		}
-		String receiver = mMapSessionIdToPeer.get(sessionid);
-		ParameterMap map = BundleAdapter.makeParameterMap(data);
-		mEpicClient.sendMessage(receiver, action, sessionid, map);
-
-	}
-
-
 	public NetworkNode[] getNetworkNodes() throws EpicClientException {
 		if(mEpicClient==null){
 			return null;
@@ -561,9 +569,12 @@ public class EpicService extends Service {
 	}
 
 
-	
-
-
+	/**
+	 * Get the commands that are announced by an different node
+	 * @param epicNode The other node
+	 * @return Infos about the commands
+	 * @throws EpicClientException
+	 */
 	public EpicCommandInfo[] getEpicCommands(String epicNode) throws EpicClientException {
 		if(mEpicClient==null){
 			return null;
@@ -572,6 +583,16 @@ public class EpicService extends Service {
 	}
 
 
+	/**
+	 * 
+	 * @param epicNode
+	 * @param command
+	 * @param sessionId
+	 * @param parametersIn
+	 * @param parametersOut
+	 * @return
+	 * @throws EpicClientException
+	 */
 	public String executeRemoteCommand(String epicNode, String command,
 			String sessionId, Bundle parametersIn,
 			Bundle parametersOut) throws EpicClientException {
@@ -586,7 +607,10 @@ public class EpicService extends Service {
 				sessionId, indata, outdata);
 	}
 
-
+	/**
+	 * Register a callback for presence information.
+	 * @param callback 
+	 */
 	public void registerPresenceCallback(PresenceCallback callback) {
 		if(mEpicClient==null){
 			return;
@@ -594,9 +618,13 @@ public class EpicService extends Service {
 		mEpicClient.registerPresenceCallback(callback);
 	}
 
+	/**
+	 * Get the state of the EpicService
+	 * @return The state of the EpicService
+	 */
 	public int getState() {
 		int state = mState.getState();
-		Log.d("MainActivity", "Service was asked for state: "+StateObject.getStateAsHumanReadableString(state));
+		//Log.d("MainActivity", "Service was asked for state: "+StateObject.getStateAsHumanReadableString(state));
 		return state;
 		
 	}

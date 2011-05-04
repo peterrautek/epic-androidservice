@@ -34,7 +34,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 /**
- * Main activity
+ * Main entry point for the user. 
+ * Shows status of the service and allows to start and stop the service.
+ * Allows the user to start the LoginActivity and the ServiceConfigurationActivity 
  *   
  * @author Peter
  */

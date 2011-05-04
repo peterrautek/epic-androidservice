@@ -23,9 +23,9 @@ import android.os.RemoteException;
  * It provides methods for 
  *  - service configuration, 
  *  - service availability, 
- *  - epic network explorarion,
+ *  - epic network exploration,
  *  - remote command execution 
- *  - etc.
+ *  - stopping the service
  *
  * @author Peter
  */

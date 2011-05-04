@@ -21,6 +21,11 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 import android.widget.RelativeLayout.LayoutParams;
 
+/**
+ * Activity that converts a ParameterMap to a user interface. Can be used to execute a remote command.
+ * @author Peter
+ *
+ */
 public class RemoteUserInterfaceActivity extends ServiceAdministrationActivity {
 	
 	private static final String CLASS_TAG = RemoteUserInterfaceActivity.class.getName();

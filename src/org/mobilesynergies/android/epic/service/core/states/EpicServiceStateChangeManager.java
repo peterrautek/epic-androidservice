@@ -12,10 +12,9 @@ import android.os.RemoteException;
 import android.util.Log;
 
 /**
- *
- * Manages callbacks that need to be informed if a state change occurs
+ * Manages callbacks that need to be informed if a state change occurs.
+ * 
  * @author Peter  
- *
  */
 public class EpicServiceStateChangeManager {
 

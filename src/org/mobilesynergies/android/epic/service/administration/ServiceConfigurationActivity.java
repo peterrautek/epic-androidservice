@@ -34,7 +34,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
-
+/**
+ * An activity that lets the user configure the permissions for each package
+ * @author Peter
+ *
+ */
 public class ServiceConfigurationActivity extends Activity {
 
 	private static final String CLASS_TAG = ServiceConfigurationActivity.class.getSimpleName();
@@ -62,8 +66,6 @@ public class ServiceConfigurationActivity extends Activity {
 			// Cache the LayoutInflate to avoid asking for a new one each time.
 			mInflater = LayoutInflater.from(context);
 		}
-
-
 
 		/**
 		 * The number of items in the list is determined by the number of speeches

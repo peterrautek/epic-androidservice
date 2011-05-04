@@ -8,6 +8,11 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+/**
+ * Static class that provides helper functionality around the state of the EpicService.
+ * @author Peter
+ *
+ */
 public class EpicServiceState {
 
 	public static int updateState(StateObject state, EpicService service, EpicClient client){

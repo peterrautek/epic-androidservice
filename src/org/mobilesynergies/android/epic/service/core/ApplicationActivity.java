@@ -20,7 +20,7 @@ import android.util.Log;
 
 /**
  * 
- * Abstract class that handles interaction with the epic service. 
+ * Abstract convenience class that handles interaction with the epic service. 
  * Activities that are based on the epic service can extend this Activity. 
  * @author Peter
  */

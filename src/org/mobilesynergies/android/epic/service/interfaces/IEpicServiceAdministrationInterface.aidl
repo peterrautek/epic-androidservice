@@ -5,6 +5,9 @@ import org.mobilesynergies.android.epic.service.interfaces.IServiceStatusChangeC
 import org.mobilesynergies.android.epic.service.interfaces.NetworkNodeImpl;
 import org.mobilesynergies.android.epic.service.interfaces.EpicCommandInfoImpl;
 
+	/**
+	* The administration interface of the EpicService
+	*/
 	interface IEpicServiceAdministrationInterface{
 	
 	

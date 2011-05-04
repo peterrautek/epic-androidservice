@@ -1,5 +1,8 @@
 package org.mobilesynergies.android.epic.service.interfaces;
 
+/**
+* Interface for callbacks that receive incoming messages
+*/
 	interface IIncomingMessageCallback {
 	
 		/**

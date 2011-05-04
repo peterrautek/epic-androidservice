@@ -1,6 +1,10 @@
 package org.mobilesynergies.android.epic.service.core.states;
 
-
+/**
+ * Object storing the state of the EpicService
+ * @author Peter
+ *
+ */
 public class StateObject {
 
 	public static final int UNKNOWN = -99;

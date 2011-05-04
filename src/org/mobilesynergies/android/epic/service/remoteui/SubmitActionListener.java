@@ -1,5 +1,10 @@
 package org.mobilesynergies.android.epic.service.remoteui;
 
+/**
+ * Must be implemented to get informed of submit actions
+ * @author Peter
+ *
+ */
 public interface SubmitActionListener {
 	
 	/**

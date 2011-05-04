@@ -7,10 +7,9 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
- * 
- * @author Peter
  * Class that holds all relevant information about a epic network node. 
- *
+ * @author Peter
+ * 
  */
 public class NetworkNodeImpl extends NetworkNode implements Parcelable {
 

@@ -1,0 +1,7 @@
+org.mobilesynergies.android.epic.service
+org.mobilesynergies.android.epic.service.administration
+org.mobilesynergies.android.epic.service.application
+org.mobilesynergies.android.epic.service.core
+org.mobilesynergies.android.epic.service.core.states
+org.mobilesynergies.android.epic.service.interfaces
+org.mobilesynergies.android.epic.service.remoteui

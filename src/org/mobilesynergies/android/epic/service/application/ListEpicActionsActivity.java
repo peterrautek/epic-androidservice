@@ -1,6 +1,5 @@
 package org.mobilesynergies.android.epic.service.application;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
@@ -8,29 +7,29 @@ import java.util.TimerTask;
 
 import org.mobilesynergies.android.epic.service.R;
 import org.mobilesynergies.android.epic.service.core.ApplicationActivity;
-import org.mobilesynergies.android.epic.service.core.states.EpicServiceState;
 import org.mobilesynergies.android.epic.service.core.states.StateObject;
 
-
-import android.app.ListActivity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.RemoteException;
-import android.provider.Browser;
 import android.util.Log;
 import android.view.Window;
-import android.widget.ArrayAdapter;
 
 /**
- * Sends the browser history information to the requesting jid
  * 
+ * Lists the epic actions that can be performed by the device.
+ * This class implements the epic action 'org.epic.action.ListActions'.
+ * It accepts two different (optional) data extras: 
+ * The integer 'start' is the index where to start the listing. The default for 'start' is 0.
+ * The integer 'size' is the maximum size that shall be retrieved (e.g., start = 10, size=5 lists a maximum of 5 epic actions starting with the entry with index 10). The default for 'size' is 10.
+ *
  * @author Peter
  */
+ 
 
 public class ListEpicActionsActivity extends ApplicationActivity{
 

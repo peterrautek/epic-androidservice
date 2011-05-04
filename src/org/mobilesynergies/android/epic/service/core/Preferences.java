@@ -1,13 +1,13 @@
 package org.mobilesynergies.android.epic.service.core;
 
-import java.util.Date;
-
-import org.mobilesynergies.android.epic.service.EpicService;
-import org.mobilesynergies.android.epic.service.administration.ConfigurationDatabase;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 
+/**
+ * Storing server and user settings.
+ *  
+ * @author Peter
+ */
 public final class Preferences {
     
 	/**

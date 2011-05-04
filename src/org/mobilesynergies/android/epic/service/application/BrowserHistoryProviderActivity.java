@@ -1,17 +1,12 @@
 package org.mobilesynergies.android.epic.service.application;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import org.mobilesynergies.android.epic.service.R;
 import org.mobilesynergies.android.epic.service.core.ApplicationActivity;
-import org.mobilesynergies.android.epic.service.core.states.EpicServiceState;
 import org.mobilesynergies.android.epic.service.core.states.StateObject;
 
-
-import android.app.ListActivity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -21,14 +16,19 @@ import android.os.RemoteException;
 import android.provider.Browser;
 import android.util.Log;
 import android.view.Window;
-import android.widget.ArrayAdapter;
 
 /**
- * Sends the browser history information to the requesting jid
- * 
+ * Sends the browser history information to the caller.
+ * This class implements the epic action 'org.epic.action.ListBrowserHistory'.
+ * It accepts three different (optional) data extras:
+ * The string 'order' is the requested sorting order of the browser history. Valid values are 'visits' and 'recent'. 
+ * If the order is set to 'recent' (default) the most recent entries in the browser history are listed first.
+ * If the order is set to 'visits' the most visited entries in the browser history are listed first.
+ * The integer 'start' is the index where to start the listing (e.g., start=5, order='recent' lists the most recent entries starting with index 5). The default for 'start' is 0.
+ * The integer 'size' is the maximum size that shall be retrieved (e.g., size=5, order='recent' lists the five most recent entries). The default for 'size' is 10.
+ *
  * @author Peter
  */
-
 public class BrowserHistoryProviderActivity extends ApplicationActivity{
 
 	private static final String CLASS_TAG = BrowserHistoryProviderActivity.class.getSimpleName();
