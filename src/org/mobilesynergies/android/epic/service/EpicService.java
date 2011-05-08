@@ -132,6 +132,24 @@ public class EpicService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		
+		Preferences.log(EpicService.this, CLASS_TAG, "creating new epic client");
+		//register the connectivity callback
+		mEpicClient.registerEpicNetworkConnectivityCallback(new EpicNetworkConnectivityCallback() {
+
+			@Override
+			public void onConnectionClosed() {
+				handleStateChanges.sendEmptyMessage(STATECHANGE_STOP);
+			}
+
+			@Override
+			public void onConnectionClosedOnError() {
+				handleStateChanges.sendEmptyMessage(STATECHANGE_XMPPERROR);
+			}
+		});
+
+		mEpicClient.registerEpicMessageCallback(mEpicMessageListener);
+		
 		Log.d(CLASS_TAG, "service onDestroy()" );
 		Preferences.log(this, CLASS_TAG, "service created");
 		//first check if the user is already registered
@@ -154,7 +172,7 @@ public class EpicService extends Service {
 	/**
 	 * Callback that is registered with the EpicClient. It is receiving messages.
 	 */
-	IncomingMessageCallback mEpicMessageListener = new IncomingMessageCallback() {
+	private final IncomingMessageCallback mEpicMessageListener = new IncomingMessageCallback() {
 
 		/**
 		 * Is called when a new message arrived. The sender is requesting the execution of an epic action. 
@@ -402,7 +420,8 @@ public class EpicService extends Service {
 			//handle the new state
 			switch(state){
 			case StateObject.INITIALIZING:
-				initEpicClient();
+				//initEpicClient();
+				handleStateChanges.sendEmptyMessage(STATECHANGE_OK);
 				break;
 			case StateObject.NETWORKCONNECTION:
 				//we either just got internet connection or lost server connection
@@ -454,7 +473,7 @@ public class EpicService extends Service {
 
 		/** 
 		 * Initializes a new EpicClient. Must only be called once!
-		 */
+		 
 		private void initEpicClient() {
 			//create a new client
 			
@@ -475,7 +494,7 @@ public class EpicService extends Service {
 
 			mEpicClient.registerEpicMessageCallback(mEpicMessageListener);
 			handleStateChanges.sendEmptyMessage(STATECHANGE_OK);
-		}
+		}*/
 
 
 	};
