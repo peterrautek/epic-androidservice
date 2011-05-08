@@ -76,12 +76,12 @@ public class EpicService extends Service {
 	/**
 	 * The implementation of the application interface
 	 */
-	private final IEpicServiceApplicationInterface mApplicationInterface = (IEpicServiceApplicationInterface) new ApplicationInterface(this);
+	private final IEpicServiceApplicationInterface.Stub mApplicationInterface = new ApplicationInterface(this);
 
 	/**
 	 * The implementation of the administration interface
 	 */
-	private final IEpicServiceAdministrationInterface mAdministrationInterface = new AdministrationInterface(this); 
+	private final IEpicServiceAdministrationInterface.Stub mAdministrationInterface = new AdministrationInterface(this); 
 
 
 
@@ -124,7 +124,7 @@ public class EpicService extends Service {
 	/**
 	 * The EpicClient handling the interaction with the XmppServer
 	 */
-	private EpicClient mEpicClient = null;  
+	private static final EpicClient mEpicClient = new EpicClient();;  
 
 	/**
 	 * Called when the service is created
@@ -132,7 +132,7 @@ public class EpicService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		//Log.d(CLASS_TAG, "service onDestroy()" );
+		Log.d(CLASS_TAG, "service onDestroy()" );
 		Preferences.log(this, CLASS_TAG, "service created");
 		//first check if the user is already registered
 		if(Preferences.isRegistered(this)){
@@ -319,7 +319,7 @@ public class EpicService extends Service {
 					if(mEpicClient!=null){
 						mEpicClient.disconnect();
 					}
-					mEpicClient = null;
+					
 					stopSelf();
 					//Log.d(CLASS_TAG, "service stopSelf!!!" );
 					break;
@@ -457,7 +457,7 @@ public class EpicService extends Service {
 		 */
 		private void initEpicClient() {
 			//create a new client
-			mEpicClient = new EpicClient();
+			
 			Preferences.log(EpicService.this, CLASS_TAG, "creating new epic client");
 			//register the connectivity callback
 			mEpicClient.registerEpicNetworkConnectivityCallback(new EpicNetworkConnectivityCallback() {
@@ -493,11 +493,11 @@ public class EpicService extends Service {
 		// Select the interface to return
 		// The application interface
 		if (intent.getAction().equals("org.mobilesynergies.EPIC_SERVICE")) {
-			return (IBinder) mApplicationInterface;
+			return mApplicationInterface;
 		}
 		// The administration interface
 		if (IEpicServiceAdministrationInterface.class.getName().equals(intent.getAction())) {
-			return (IBinder) mAdministrationInterface;
+			return mAdministrationInterface;
 		}
 
 		// Unknown action 
@@ -624,7 +624,7 @@ public class EpicService extends Service {
 	 */
 	public int getState() {
 		int state = mState.getState();
-		//Log.d("MainActivity", "Service was asked for state: "+StateObject.getStateAsHumanReadableString(state));
+		Log.d(CLASS_TAG, "Service was asked for state: "+StateObject.getStateAsHumanReadableString(state));
 		return state;
 		
 	}
