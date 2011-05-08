@@ -327,13 +327,21 @@ public class MainActivity extends Activity{
 		Log.d(CLASS_TAG, "start service..." );
 		//String strServiceName = IEpicServiceApplicationInterface.class.getName();
 		Intent intent = new Intent("org.mobilesynergies.android.epic.service.interfaces.IEpicServiceAdministrationInterface");
-		if(bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE)){
-			Log.d(CLASS_TAG, "bind service!!!" );
+		ComponentName c = startService(intent);
+		if(c==null){
+			mStateChangeHandler.sendEmptyMessage(MESSAGEID_SERVICENOTRUNNING);
+			Log.d(CLASS_TAG, "start service failed!!!" );
+			return;
+		}
+		
+		
+		if(bindService(intent, mServiceConnection, BIND_AUTO_CREATE)){
+			Log.d(CLASS_TAG, "bind service!!!" );	
 		} else {
 			mStateChangeHandler.sendEmptyMessage(MESSAGEID_SERVICENOTRUNNING);
 			Log.d(CLASS_TAG, "bind service failed!!!" );
 		}
-
+		
 	}
 
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
@@ -368,7 +376,7 @@ public class MainActivity extends Activity{
 			mEpicService = (IEpicServiceAdministrationInterface) IEpicServiceAdministrationInterface.Stub.asInterface(service);
 			mIsBound = true;
 			try {
-				Log.d("MainActivity", "registering status change callback " + mServiceStatusChangeCallback);
+				//Log.d("MainActivity", "registering status change callback " + mServiceStatusChangeCallback);
 				mEpicService.registerServiceStatusChangeCallback(mServiceStatusChangeCallback);
 				int state = mEpicService.getState();
 				MainActivity.this.mStateChangeHandler.sendEmptyMessage(state);

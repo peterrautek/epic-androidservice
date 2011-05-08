@@ -1,6 +1,7 @@
 package org.mobilesynergies.android.epic.service;
 
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.mobilesynergies.android.epic.service.Manifest.permission;
 import org.mobilesynergies.android.epic.service.administration.ConfigurationDatabase;
@@ -55,7 +56,7 @@ public class EpicService extends Service {
 	/**
 	 * Class identification string
 	 */
-	private static String CLASS_TAG = EpicService.class.getSimpleName();
+	private static final String CLASS_TAG = EpicService.class.getSimpleName();
 	/**
 	 * The widget that shows the state of the EpicService
 	 */
@@ -64,13 +65,13 @@ public class EpicService extends Service {
 	/**
 	 * A map storing unique session ids with their associated peer (i.e., the jid of the sender)
 	 */
-	private HashMap<String, String> mMapSessionIdToPeer = new HashMap<String, String>(); 
+	private static final ConcurrentHashMap<String, String> mMapSessionIdToPeer = new ConcurrentHashMap<String, String>(); 
 
 
 	/**
 	 * Sends notifications (about state changes of the service) to activities that are bound via the application interface or the administration interface
 	 */
-	EpicServiceStateChangeManager mServiceStateChangeManager = new EpicServiceStateChangeManager();
+	private static final EpicServiceStateChangeManager mServiceStateChangeManager = new EpicServiceStateChangeManager();
 
 	
 	/**
@@ -118,7 +119,7 @@ public class EpicService extends Service {
 	/**
 	 * The state of the EpicService
 	 */
-	StateObject mState = new StateObject();
+	private static final StateObject mState = new StateObject();
 	
 
 	/**
@@ -132,7 +133,7 @@ public class EpicService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		
+		Log.d(CLASS_TAG, "service onCreate()" );
 		Preferences.log(EpicService.this, CLASS_TAG, "creating new epic client");
 		//register the connectivity callback
 		mEpicClient.registerEpicNetworkConnectivityCallback(new EpicNetworkConnectivityCallback() {
@@ -285,7 +286,7 @@ public class EpicService extends Service {
 	 */
 	@Override
 	public void onStart(Intent intent, int startId) {
-		//Log.d(CLASS_TAG, "service onStart()" );
+		Log.d(CLASS_TAG, "service onStart()" );
 		Preferences.log(this, CLASS_TAG, "service started");
 		//first check if the user is already registered
 		if(Preferences.isRegistered(this)){
@@ -307,7 +308,7 @@ public class EpicService extends Service {
 	
 	@Override
 	public void onDestroy() {
-		//Log.d(CLASS_TAG, "service onDestroy()" );
+		Log.d(CLASS_TAG, "service onDestroy()" );
 		Preferences.log(this, CLASS_TAG, "service destroyed");
 	}
 
@@ -529,7 +530,9 @@ public class EpicService extends Service {
 	 * @param callback The callback that will be notified about changes
 	 */
 	public void registerServiceStatusChangeCallback(IServiceStatusChangeCallback callback) {
-		//Log.d(CLASS_TAG, "service adding statuscallback: "+callback);
+		Log.d(CLASS_TAG, "service adding statuscallback: "+callback);
+		int state = mState.getState();
+		Log.d(CLASS_TAG, "the state at this point is: "+StateObject.getStateAsHumanReadableString(state));
 		mServiceStateChangeManager.addServiceStatusCallback(callback);
 	}
 
@@ -551,7 +554,7 @@ public class EpicService extends Service {
 	 * @param data The data that is the result of the action
 	 */
 	public void sendMessage(String action, String sessionId, Bundle data) {
-
+		Log.w(CLASS_TAG, "Trying to send message with sessionId"+ sessionId+".");
 		int iPermissionSendMessagesStatus = checkCallingOrSelfPermission(permission.sendmessages);
 		if(iPermissionSendMessagesStatus==PackageManager.PERMISSION_DENIED){
 			Log.w(CLASS_TAG, "The calling application is missing the permission"+ permission.sendmessages+".");

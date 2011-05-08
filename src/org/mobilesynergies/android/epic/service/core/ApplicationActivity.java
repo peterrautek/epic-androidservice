@@ -109,7 +109,7 @@ public abstract class ApplicationActivity extends Activity {
 			// service through an IDL interface, so get a client-side
 			// representation of that from the raw service object.
 
-			mEpicService = (IEpicServiceApplicationInterface) IEpicServiceApplicationInterface.Stub.asInterface(service);
+			mEpicService = IEpicServiceApplicationInterface.Stub.asInterface(service);
 			mIsBound = true;
 			try {
 				mEpicService.registerServiceStatusChangeCallback(mServiceStatusChangeCallback);

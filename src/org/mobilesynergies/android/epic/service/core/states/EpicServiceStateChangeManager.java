@@ -18,6 +18,7 @@ import android.util.Log;
  */
 public class EpicServiceStateChangeManager {
 
+	private static final String CLASS_TAG = EpicServiceStateChangeManager.class.getSimpleName();
 	/**
 	 * Stores the callbacks that wish to be informed about changes in service availability.
 	 */
@@ -45,7 +46,7 @@ public class EpicServiceStateChangeManager {
 	}
 
 	public void addServiceStatusCallback(IServiceStatusChangeCallback callback) {
-		Log.d("MainActivity", "added state change listener: " + callback);
+		Log.d(CLASS_TAG, "added state change listener: " + callback);
 		mSetServiceStatusCallbacks.add(callback);		
 	}
 
