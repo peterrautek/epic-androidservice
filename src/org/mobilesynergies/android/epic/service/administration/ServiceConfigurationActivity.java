@@ -262,8 +262,9 @@ public class ServiceConfigurationActivity extends Activity {
 
 					PACKAGENAMES[iInitialized] = content.packageName;
 					CLASSNAMES[iInitialized] = content.className;
-					String strUniqueId = ConfigurationDatabase.getUniqueId(content.packageName, content.className);
-					int iPermission = mPermissionDatabase.getPermissionValue(strUniqueId);
+					//String strUniqueId = ConfigurationDatabase.getUniqueId(content.packageName, content.className);
+					//int iPermission = mPermissionDatabase.getPermissionValue(strUniqueId);
+					int iPermission = mPermissionDatabase.getPermissionValue(PACKAGENAMES[iInitialized]);
 					PERMISSIONS[iInitialized] = iPermission;
 
 					iInitialized++;
@@ -285,8 +286,10 @@ public class ServiceConfigurationActivity extends Activity {
 			}
 
 			PERMISSIONS[position] = iPermission;
-			String strUniqueId = ConfigurationDatabase.getUniqueId(PACKAGENAMES[position], CLASSNAMES[position]);
-			mPermissionDatabase.updateEntry(strUniqueId, iPermission);
+			//String strUniqueId = ConfigurationDatabase.getUniqueId(PACKAGENAMES[position], CLASSNAMES[position]);
+			//mPermissionDatabase.updateEntry(strUniqueId, iPermission);
+			mPermissionDatabase.updateEntry(PACKAGENAMES[position], iPermission);
+			
 			view.invalidate();
 			mAdapter.notifyDataSetChanged();
 		}

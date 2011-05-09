@@ -192,9 +192,11 @@ public class ConfigurationDatabase {
 		return bContains;
 	}
 
-	public static String getUniqueId(String packagename, String classname) {
+	/*
+	 public static String getUniqueId(String packagename, String classname) {
+	 
 		return packagename+"/"+classname;
-	}
+	}*/
 
 
 	static {

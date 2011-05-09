@@ -54,7 +54,7 @@ public class RingMyPhoneActivity extends Activity {
 		try {
 			//this seems to fix an android bug concerning the keyguard and wake lock!?
 			//not completely sure though
-			Thread.sleep(750);
+			Thread.sleep(500);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -62,9 +62,9 @@ public class RingMyPhoneActivity extends Activity {
 
 		PowerManager pm = (PowerManager)getApplicationContext().getSystemService(Context.POWER_SERVICE);
 		mWakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, CLASS_TAG);
-		/*	if(!mWakeLock.isHeld()){
+		if((mWakeLock!=null)&&(!mWakeLock.isHeld())){
 			mWakeLock.acquire();
-		}*/
+		}
 
 
 	}
@@ -97,7 +97,8 @@ public class RingMyPhoneActivity extends Activity {
 
 			if (mRingtone != null) {
 				Log.e(CLASS_TAG, "Playing ringtone!");
-				mRingtone.setStreamType(AudioManager.STREAM_RING);
+				//playing on the notification stream - the ringtone stream made troubles on certain phones
+				mRingtone.setStreamType(AudioManager.STREAM_NOTIFICATION);
 				mRingtone.play();
 
 			} else {

@@ -27,11 +27,18 @@ import org.mobilesynergies.epic.client.PresenceCallback;
 import org.mobilesynergies.epic.client.remoteui.EpicCommandInfo;
 import org.mobilesynergies.epic.client.remoteui.ParameterMap;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.media.AudioManager;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -231,7 +238,8 @@ public class EpicService extends Service {
 			// check for permission configuration
 			int iPermission = ConfigurationDatabase.PERMISSION_UNKNOWN;
 			ConfigurationDatabase permissionDatabase = new ConfigurationDatabase(EpicService.this);
-			iPermission = permissionDatabase.getPermissionValue(ConfigurationDatabase.getUniqueId(packageName, className));
+			//iPermission = permissionDatabase.getPermissionValue(ConfigurationDatabase.getUniqueId(packageName, className));
+			iPermission = permissionDatabase.getPermissionValue(packageName);
 			
 
 			// execute permission model
@@ -244,7 +252,8 @@ public class EpicService extends Service {
 			}
 			
 			if(iPermission==ConfigurationDatabase.PERMISSION_ASK){
-				//TODO
+				Intent configureintent = new Intent(ServiceConfigurationActivity.INTENTACTION);
+				generateNotification("Change permission of package: "+ packageName, "Remote lanch blocked", configureintent);
 				return true;
 			}
 			
@@ -304,6 +313,33 @@ public class EpicService extends Service {
 		}
 	}
 	
+	
+	private void generateNotification(String msg, String title, Intent intent) {
+		int icon = R.drawable.notification_icon;
+		long when = System.currentTimeMillis();
+
+		Notification notification = new Notification(icon, title, when);
+		notification.setLatestEventInfo(this, title, msg,
+				PendingIntent.getActivity(this, 0, intent, 0));
+		notification.flags |= Notification.FLAG_AUTO_CANCEL;
+
+		
+		NotificationManager nm =
+			(NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+		nm.notify(0, notification);
+		playNotificationSound();
+
+		
+	}
+	
+	private void playNotificationSound( ) {
+		Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+		if (uri != null) {
+			Ringtone rt = RingtoneManager.getRingtone(this, uri);
+			rt.setStreamType(AudioManager.STREAM_NOTIFICATION);
+			if (rt != null) rt.play();
+		}
+	}
 	
 	
 	@Override
