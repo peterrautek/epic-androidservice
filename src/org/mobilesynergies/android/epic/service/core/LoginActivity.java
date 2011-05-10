@@ -1,15 +1,11 @@
 package org.mobilesynergies.android.epic.service.core;
 
 import org.mobilesynergies.android.epic.service.R;
-import org.mobilesynergies.android.epic.service.administration.ServiceAdministrationActivity;
-import org.mobilesynergies.android.epic.service.core.IntentIntegrator;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -20,7 +16,6 @@ import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 /**

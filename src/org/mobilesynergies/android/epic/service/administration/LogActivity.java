@@ -2,10 +2,7 @@ package org.mobilesynergies.android.epic.service.administration;
 
 import org.mobilesynergies.android.epic.service.core.Preferences;
 
-import android.app.AlertDialog;
 import android.app.ListActivity;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;

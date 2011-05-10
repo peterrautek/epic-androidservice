@@ -1,27 +1,18 @@
 package org.mobilesynergies.android.epic.service.application;
 
 import org.mobilesynergies.android.epic.service.R;
-import org.mobilesynergies.android.epic.service.core.Preferences;
 
 import android.app.Activity;
 import android.app.KeyguardManager;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.PowerManager;
-import android.text.ClipboardManager;
 import android.util.Log;
 import android.view.Window;
-import android.widget.TextView;
 
 /**
  * Rings the phone. 

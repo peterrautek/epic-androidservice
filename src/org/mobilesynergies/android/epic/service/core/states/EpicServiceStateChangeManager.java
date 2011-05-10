@@ -3,11 +3,8 @@ package org.mobilesynergies.android.epic.service.core.states;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import org.mobilesynergies.android.epic.service.interfaces.IApplicationStatusChangeCallback;
-import org.mobilesynergies.android.epic.service.interfaces.IIncomingMessageCallback;
 import org.mobilesynergies.android.epic.service.interfaces.IServiceStatusChangeCallback;
 
-import android.os.Bundle;
 import android.os.RemoteException;
 import android.util.Log;
 

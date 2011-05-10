@@ -1,11 +1,7 @@
 package org.mobilesynergies.android.epic.service.core;
 
 import org.mobilesynergies.android.epic.service.EpicService;
-
 import org.mobilesynergies.android.epic.service.interfaces.IEpicServiceApplicationInterface;
-import org.mobilesynergies.android.epic.service.interfaces.IncomingMessageCallbackImpl;
-
-import org.mobilesynergies.android.epic.service.interfaces.IIncomingMessageCallback;
 import org.mobilesynergies.android.epic.service.interfaces.IServiceStatusChangeCallback;
 
 import android.os.Bundle;

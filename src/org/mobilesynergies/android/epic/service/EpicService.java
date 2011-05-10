@@ -1,6 +1,5 @@
 package org.mobilesynergies.android.epic.service;
 
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.mobilesynergies.android.epic.service.Manifest.permission;
@@ -16,7 +15,6 @@ import org.mobilesynergies.android.epic.service.core.states.StateObject;
 import org.mobilesynergies.android.epic.service.interfaces.IEpicServiceAdministrationInterface;
 import org.mobilesynergies.android.epic.service.interfaces.IEpicServiceApplicationInterface;
 import org.mobilesynergies.android.epic.service.interfaces.IServiceStatusChangeCallback;
-import org.mobilesynergies.android.epic.service.interfaces.IncomingMessageCallbackImpl;
 import org.mobilesynergies.android.epic.service.remoteui.BundleAdapter;
 import org.mobilesynergies.epic.client.EpicClient;
 import org.mobilesynergies.epic.client.EpicClientException;

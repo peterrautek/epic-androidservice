@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-
 import org.mobilesynergies.android.epic.service.R;
 import org.mobilesynergies.android.epic.service.interfaces.EpicCommandInfoImpl;
 import org.mobilesynergies.android.epic.service.interfaces.IPresenceStatusChangeCallback;
@@ -36,8 +35,6 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
 
 
 /**

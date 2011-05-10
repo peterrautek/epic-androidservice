@@ -1,10 +1,7 @@
 package org.mobilesynergies.android.epic.service.core;
 
 import org.mobilesynergies.android.epic.service.EpicService;
-import org.mobilesynergies.android.epic.service.core.states.EpicServiceState;
-import org.mobilesynergies.android.epic.service.core.states.EpicServiceStateChangeManager;
 import org.mobilesynergies.android.epic.service.core.states.StateObject;
-
 import org.mobilesynergies.android.epic.service.interfaces.IEpicServiceApplicationInterface;
 import org.mobilesynergies.android.epic.service.interfaces.IServiceStatusChangeCallback;
 

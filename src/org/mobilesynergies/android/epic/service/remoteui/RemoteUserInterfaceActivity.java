@@ -1,13 +1,10 @@
 package org.mobilesynergies.android.epic.service.remoteui;
 
 import org.mobilesynergies.android.epic.service.administration.ServiceAdministrationActivity;
-import org.mobilesynergies.android.epic.service.core.states.EpicServiceState;
 import org.mobilesynergies.android.epic.service.core.states.StateObject;
 import org.mobilesynergies.epic.client.remoteui.Parameter;
 import org.mobilesynergies.epic.client.remoteui.ParameterMap;
 
-import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
